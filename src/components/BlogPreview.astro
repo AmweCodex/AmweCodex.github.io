@@ -1,0 +1,51 @@
+---
+/*
+  BlogPreview.astro
+  ------------------------------------------------------------------------
+  Same idea as ProjectsPreview.astro, for the "blog" collection instead —
+  latest 3 posts, newest first, with a link through to /blog for the rest.
+------------------------------------------------------------------------- */
+import { getCollection } from 'astro:content';
+import BlogCard from './BlogCard.astro';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const latest = allPosts
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+
+<section id="blog" class="section">
+  <div class="container">
+    <div class="section-heading-row">
+      <div>
+        <p class="eyebrow"><span class="led-dot"></span>Blog</p>
+        <h2>Latest from the PLC learning journey</h2>
+      </div>
+      <a class="btn btn-ghost" href="/blog">View all posts</a>
+    </div>
+
+    <div class="blog-grid">
+      {latest.map((entry) => <BlogCard entry={entry} />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-heading-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+  .section-heading-row h2 {
+    margin-bottom: 0;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+  }
+</style>

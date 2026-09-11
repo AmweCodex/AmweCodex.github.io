@@ -1,0 +1,97 @@
+---
+/*
+  BlogCard.astro
+  ------------------------------------------------------------------------
+  Same pattern as ProjectCard.astro, for blog posts instead. Shows the
+  cover image, title, short summary, publish date, and up to 3 tags —
+  the full post body only renders on /blog/<id>.
+------------------------------------------------------------------------- */
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'blog'>;
+}
+
+const { entry } = Astro.props;
+const { title, summary, cover, tags, date } = entry.data;
+
+// Format the date as e.g. "12 Jan 2026" — readable, locale-neutral
+const formattedDate = date.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+<a class="blog-card card" href={`/blog/${entry.id}`}>
+  <div class="card-image">
+    <img src={cover} alt="" loading="lazy" />
+  </div>
+  <div class="card-body">
+    <p class="card-date">{formattedDate}</p>
+    <h3>{title}</h3>
+    <p class="card-summary">{summary}</p>
+    {tags.length > 0 && (
+      <div class="tag-row">
+        {tags.slice(0, 3).map((tag) => <span class="tag">{tag}</span>)}
+      </div>
+    )}
+  </div>
+</a>
+
+<style>
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .card-image {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--divider-color);
+  }
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .blog-card:hover .card-image img {
+    transform: scale(1.05);
+  }
+
+  .card-body {
+    padding: var(--space-md);
+  }
+
+  .card-date {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--teal);
+    margin-bottom: 0.3rem;
+  }
+
+  .card-body h3 {
+    font-size: 1.05rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .card-summary {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    margin-bottom: var(--space-sm);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+</style>

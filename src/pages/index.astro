@@ -1,17 +1,28 @@
 ---
-
+/*
+  index.astro
+  ------------------------------------------------------------------------
+  The homepage. Assembles sections in order, wrapped in the shared Layout.
+  Skills moved out to /about (see about.astro) — this page now shows a
+  preview of the 3 latest projects and 3 latest blog posts instead, each
+  linking through to their full listing page.
+------------------------------------------------------------------------- */
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import ProjectsPreview from '../components/ProjectsPreview.astro';
+import BlogPreview from '../components/BlogPreview.astro';
+import Experience from '../components/Experience.astro';
+import Certifications from '../components/Certifications.astro';
+import LadderRung from '../components/LadderRung.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Musawandile Shamase — Electronics & Computer Engineering">
+  <Hero />
+  <LadderRung label="PROJECTS" />
+  <ProjectsPreview />
+  <LadderRung label="BLOG" />
+  <BlogPreview />
+  <LadderRung label="EXPERIENCE" />
+  <Experience />
+  <Certifications />
+</Layout>

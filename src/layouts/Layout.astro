@@ -1,0 +1,68 @@
+---
+/*
+  Layout.astro
+  ------------------------------------------------------------------------
+  This is the "page frame". Every page (right now just index.astro) wraps
+  its content in this layout, like:
+
+      <Layout title="..." description="...">
+        ...page content...
+      </Layout>
+
+  Putting the <html>/<head>/fonts/global.css/Header/Footer here means you
+  only write them once, instead of copy-pasting them onto every page you
+  add later (e.g. a future /blog page would use this same layout).
+------------------------------------------------------------------------- */
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Portfolio of Musawandile Shamase — Electronics & Computer Engineering graduate specialising in embedded systems and industrial automation (PLCs).',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/profile.jpg" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!--
+      Fonts: loaded from Google Fonts as variable fonts.
+      preconnect first = tells the browser to open the connection early,
+      so the fonts arrive faster (small performance best-practice).
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Header is fixed/sticky and appears above every page's content -->
+    <Header />
+
+    <!--
+      <slot /> is Astro's placeholder for "whatever was written between
+      <Layout> and </Layout> in the page that used this layout". This is
+      how index.astro's sections end up rendered here.
+    -->
+    <main>
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,141 @@
+---
+/*
+  src/pages/blog/[...id].astro  →  e.g. /blog/starting-my-plc-journey
+  ------------------------------------------------------------------------
+  Same pattern as src/pages/projects/[...id].astro — see the comments
+  there for how getStaticPaths() + render() work, and why "..." matters.
+  This version reads from the "blog" collection instead of "projects".
+  Blog posts are all flat right now, but using [...id] here too means
+  you can start organising posts into folders later (e.g. blog/PLC/,
+  blog/Career/) without anything breaking.
+------------------------------------------------------------------------- */
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { title, cover, tags, date } = entry.data;
+const { Content } = await render(entry);
+
+const formattedDate = date.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+<Layout title={`${title} — Musawandile Shamase`} description={entry.data.summary}>
+  <article class="section post-detail">
+    <div class="container narrow">
+      <a class="back-link" href="/blog">&larr; All posts</a>
+
+      <p class="eyebrow"><span class="led-dot"></span>{formattedDate}</p>
+      <h1>{title}</h1>
+
+      {tags.length > 0 && (
+        <div class="tag-row">
+          {tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
+      )}
+
+      <div class="cover-image">
+        <img src={cover} alt="" />
+      </div>
+
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .container.narrow {
+    max-width: 760px;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-color);
+    margin-bottom: var(--space-md);
+    transition: color 0.15s ease;
+  }
+  .back-link:hover {
+    color: var(--teal);
+  }
+
+  .post-detail h1 {
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    margin-top: var(--space-xs);
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: var(--space-sm) 0 var(--space-md);
+  }
+
+  .cover-image {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--space-lg);
+  }
+  .cover-image img {
+    width: 100%;
+    display: block;
+  }
+
+  .prose :global(h2) {
+    font-size: 1.4rem;
+    margin-top: var(--space-lg);
+  }
+  .prose :global(h3) {
+    font-size: 1.15rem;
+    margin-top: var(--space-md);
+  }
+  .prose :global(p) {
+    margin-bottom: var(--space-sm);
+  }
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.3rem;
+    margin-bottom: var(--space-sm);
+  }
+  .prose :global(li) {
+    margin-bottom: 0.4rem;
+  }
+  .prose :global(strong) {
+    color: var(--heading-color);
+  }
+  .prose :global(code) {
+    font-family: var(--font-mono);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+  .prose :global(a) {
+    color: var(--teal);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .prose :global(blockquote) {
+    border-left: 3px solid var(--teal);
+    padding-left: var(--space-sm);
+    color: var(--text-color);
+    font-style: italic;
+    margin: var(--space-md) 0;
+  }
+</style>

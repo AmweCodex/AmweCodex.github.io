@@ -1,0 +1,59 @@
+---
+/*
+  ProjectsPreview.astro
+  ------------------------------------------------------------------------
+  Homepage-only section: pulls every entry from the "projects" content
+  collection, drops any marked draft: true, sorts newest-first by date,
+  and shows only the first 3. The full list lives at /projects — this is
+  just a teaser with a "View all projects" link.
+------------------------------------------------------------------------- */
+import { getCollection } from 'astro:content';
+import ProjectCard from './ProjectCard.astro';
+
+const allProjects = await getCollection('projects', ({ data }) => !data.draft);
+const latest = allProjects
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+
+<section id="projects" class="section alt-section">
+  <div class="container">
+    <div class="section-heading-row">
+      <div>
+        <p class="eyebrow"><span class="led-dot"></span>Projects</p>
+        <h2>Latest engineering projects</h2>
+      </div>
+      <a class="btn btn-ghost" href="/projects">View all projects</a>
+    </div>
+
+    <div class="projects-grid">
+      {latest.map((entry) => <ProjectCard entry={entry} />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .alt-section {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--divider-color);
+    border-bottom: 1px solid var(--divider-color);
+  }
+
+  .section-heading-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+  .section-heading-row h2 {
+    margin-bottom: 0;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+  }
+</style>

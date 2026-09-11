@@ -1,0 +1,163 @@
+---
+/*
+  src/pages/projects/[...id].astro  →  e.g. /projects/smart-home-irrigation
+  or /projects/Engineering/cable-fault-detection when the .md file lives
+  in a subfolder.
+  ------------------------------------------------------------------------
+  A "dynamic route": the [...id] in the filename means this ONE file
+  generates a separate page for every project. `getStaticPaths()` below
+  tells Astro exactly which pages to generate — one per entry in the
+  "projects" collection, using that entry's `id` (which Astro derives
+  from the markdown file's path, e.g. smart-home-irrigation.md → id
+  "smart-home-irrigation", or Engineering/cable-fault-detection.md → id
+  "Engineering/cable-fault-detection").
+
+  IMPORTANT — the "..." (rest parameter) is what fixed folder-separated
+  projects: a plain [id] can only ever match ONE path segment, so as soon
+  as you organised projects into subfolders (Engineering/, Automation/,
+  etc.) their id contained a "/" and the page 404'd. [...id] matches any
+  number of segments, so nested folders now work correctly.
+
+  This is the page that shows the FULL write-up (the markdown body),
+  unlike ProjectCard.astro which only ever shows the short `summary`.
+------------------------------------------------------------------------- */
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+// Tells Astro which pages to build: one per project entry
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', ({ data }) => !data.draft);
+  return projects.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { title, cover, stack, date } = entry.data;
+
+// render() turns this entry's markdown body into a <Content /> component
+const { Content } = await render(entry);
+
+const formattedDate = date.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+<Layout title={`${title}`} description={entry.data.summary}>
+  <article class="section project-detail">
+    <div class="container narrow">
+      <a class="back-link" href="/projects">&larr; All projects</a>
+
+      <p class="eyebrow"><span class="led-dot"></span>{formattedDate}</p>
+      <h1>{title}</h1>
+
+      {stack.length > 0 && (
+        <div class="tag-row">
+          {stack.map((item) => <span class="tag">{item}</span>)}
+        </div>
+      )}
+
+      <div class="cover-image">
+        <img src={cover} alt="" />
+      </div>
+
+      <!--
+        prose = a class we style in <style> below purely to make markdown
+        output (h2, p, ul, etc. — no classes of their own) look right.
+      -->
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .container.narrow {
+    max-width: 760px;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-color);
+    margin-bottom: var(--space-md);
+    transition: color 0.15s ease;
+  }
+  .back-link:hover {
+    color: var(--teal);
+  }
+
+  .project-detail h1 {
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    margin-top: var(--space-xs);
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: var(--space-sm) 0 var(--space-md);
+  }
+
+  .cover-image {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--space-lg);
+  }
+  .cover-image img {
+    width: 100%;
+    display: block;
+  }
+
+  /* ---- Markdown body styling ------------------------------------- */
+  /* :global() reaches into the plain HTML that <Content /> renders,
+     since that markup doesn't carry component-scoped classes itself. */
+  .prose :global(h2) {
+    font-size: 1.4rem;
+    margin-top: var(--space-lg);
+  }
+  .prose :global(h3) {
+    font-size: 1.15rem;
+    margin-top: var(--space-md);
+  }
+  .prose :global(p) {
+    margin-bottom: var(--space-sm);
+  }
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.3rem;
+    margin-bottom: var(--space-sm);
+  }
+  .prose :global(li) {
+    margin-bottom: 0.4rem;
+  }
+  .prose :global(strong) {
+    color: var(--heading-color);
+  }
+  .prose :global(code) {
+    font-family: var(--font-mono);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+  .prose :global(a) {
+    color: var(--teal);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .prose :global(blockquote) {
+    border-left: 3px solid var(--teal);
+    padding-left: var(--space-sm);
+    color: var(--text-color);
+    font-style: italic;
+    margin: var(--space-md) 0;
+  }
+</style>

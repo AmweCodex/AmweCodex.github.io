@@ -1,0 +1,79 @@
+---
+/*
+  Footer.astro
+  ------------------------------------------------------------------------
+  Lives in Layout.astro (not index.astro), so it automatically appears on
+  every page you add later. Repeats the résumé download + socials so
+  they're reachable even after someone has scrolled all the way down.
+------------------------------------------------------------------------- */
+import SocialLinks from './SocialLinks.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer id="contact" class="site-footer">
+  <div class="container footer-inner">
+    <p class="eyebrow"><span class="led-dot"></span>Contact</p>
+    <h2>Let's build something</h2>
+    <p class="footer-text">
+      Open to Junior engineering, Industrial Automation and Graduate
+      Development roles — and happy to relocate anywhere in South Africa for Now.
+    </p>
+
+    <div class="footer-actions">
+      <a class="btn btn-primary" href="mailto:shamasemusawandile@gmail.com">Email Me</a>
+      <a
+        class="btn btn-ghost"
+        href="/Musawandile-Shamase-Resume.pdf"
+        download="Musawandile-Shamase-Resume.pdf"
+      >
+        Download Resume
+      </a>
+    </div>
+
+    <SocialLinks />
+
+    <p class="footer-copy">© {year} Musawandile Shamase. Built with Astro.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--divider-color);
+    padding: var(--space-xl) 0 var(--space-md);
+    text-align: center;
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-text {
+    max-width: 42ch;
+    margin-bottom: var(--space-md);
+    /* Override the global justify: this paragraph sits in a centered
+       footer layout, so it should stay centered, not justified. */
+    text-align: center;
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: var(--space-md);
+  }
+
+  .site-footer :global(.social-links) {
+    margin-bottom: var(--space-lg);
+  }
+
+  .footer-copy {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--border-color);
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,140 @@
+---
+/*
+  Experience.astro
+  ------------------------------------------------------------------------
+  A vertical timeline: one continuous "rail" line on the left (drawn with
+  a CSS pseudo-element on .timeline, see <style>), with a small teal dot
+  marking each entry. This continues the ladder-logic "rail" visual
+  language from LadderRung.astro without repeating identical markup.
+------------------------------------------------------------------------- */
+const experience = [
+  {
+    role: 'Merchandiser',
+    org: 'MyChina, Boksburg, South Africa',
+    period: 'April 2026 – Present',
+    points: [
+      'Maintain product displays, stock replenishment and inventory accuracy in a high-volume retail environment.',
+      'Demonstrate operational discipline, attention to detail and team coordination to consistently meet daily targets.',
+    ],
+  },
+  {
+    role: 'Educational Assistant',
+    org: 'KwaBulawayo High School (Dept. of Basic Education)',
+    period: 'June 2025 – November 2025',
+    points: [
+      'Supported educators with lesson preparation, classroom administration and academic tracking.',
+      'Delivered structured academic guidance and tutoring to learners in core STEM subjects.',
+    ],
+  },
+  {
+    role: 'Volunteer Programming Tutor',
+    org: 'Dataholics Student Organisation, Durban',
+    period: 'March 2022 – August 2024',
+    points: [
+      'Tutored undergraduate students in programming fundamentals, logic design and software debugging.',
+      'Ran practical coding workshops and test-preparation sessions to improve academic outcomes.',
+    ],
+  },
+];
+---
+
+<section id="experience" class="section">
+  <div class="container">
+    <p class="eyebrow"><span class="led-dot"></span>Experience</p>
+    <h2>Where I've worked</h2>
+
+    <div class="timeline">
+      {experience.map((job) => (
+        <div class="timeline-entry">
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <h3>{job.role}</h3>
+              <span class="timeline-period">{job.period}</span>
+            </div>
+            <p class="timeline-org">{job.org}</p>
+            <ul>
+              {job.points.map((point) => <li>{point}</li>)}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .timeline {
+    position: relative;
+    margin-top: var(--space-md);
+    padding-left: var(--space-md);
+  }
+
+  /* The continuous vertical rail, drawn once behind all entries */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: var(--border-color);
+  }
+
+  .timeline-entry {
+    position: relative;
+    padding-bottom: var(--space-lg);
+  }
+  .timeline-entry:last-child {
+    padding-bottom: 0;
+  }
+
+  .timeline-marker {
+    position: absolute;
+    left: -1px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    margin-left: -4px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 0 4px var(--bg-primary), 0 0 10px 2px var(--teal-glow);
+  }
+
+  .timeline-content {
+    margin-left: var(--space-md);
+  }
+
+  .timeline-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-sm);
+  }
+  .timeline-header h3 {
+    margin-bottom: 0;
+    font-size: 1.1rem;
+  }
+
+  .timeline-period {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--teal);
+    white-space: nowrap;
+  }
+
+  .timeline-org {
+    color: var(--text-color);
+    font-size: 0.9rem;
+    margin: 0.2rem 0 var(--space-sm);
+  }
+
+  .timeline-content ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.92rem;
+  }
+  .timeline-content li + li {
+    margin-top: 0.4rem;
+  }
+</style>

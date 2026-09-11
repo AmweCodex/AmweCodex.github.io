@@ -1,0 +1,98 @@
+---
+/*
+  LadderRung.astro
+  ------------------------------------------------------------------------
+  This is the site's "signature element" — one small idea repeated
+  consistently, instead of generic decoration.
+
+  It's drawn to look like a single rung of a PLC ladder-logic diagram:
+  two vertical power rails on the left/right, connected by a horizontal
+  rung in the middle, with a small "contact" node and a dot that pulses
+  along the wire like a live signal. This is literally the language
+  Musawandile writes when programming PLCs, so it doubles as a section
+  divider AND a nod to the subject matter — not just decoration.
+
+  USAGE: drop <LadderRung /> between two <section> elements in index.astro.
+  Optional prop: label — short mono text shown at the centre of the rung
+  (e.g. "IO-01", "RUNG 02"), purely decorative/thematic.
+------------------------------------------------------------------------- */
+interface Props {
+  label?: string;
+}
+const { label = '' } = Astro.props;
+---
+
+<div class="ladder-rung" role="presentation" aria-hidden="true">
+  <div class="rail"></div>
+
+  <svg class="rung" viewBox="0 0 400 40" preserveAspectRatio="none">
+    <!-- the horizontal wire -->
+    <line x1="0" y1="20" x2="400" y2="20" class="wire" />
+    <!-- a normally-open "contact" symbol, drawn like real ladder logic -->
+    <line x1="185" y1="8" x2="185" y2="32" class="contact" />
+    <line x1="215" y1="8" x2="215" y2="32" class="contact" />
+    <!-- signal dot that animates travelling left -> right along the wire -->
+    <circle r="3.5" class="pulse">
+      <animateMotion
+        dur="3.2s"
+        repeatCount="indefinite"
+        path="M0,20 L400,20"
+      />
+    </circle>
+  </svg>
+
+  {label && <span class="rung-label">{label}</span>}
+
+  <div class="rail"></div>
+</div>
+
+<style>
+  .ladder-rung {
+    position: relative; /* so .rung-label below can center itself against this */
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0 var(--space-md);
+    max-width: var(--content-width);
+    margin: 0 auto;
+    opacity: 0.8;
+  }
+
+  /* Left/right vertical "power rails" — just short fixed-width lines */
+  .rail {
+    width: 2px;
+    height: 28px;
+    background: var(--border-color);
+    flex-shrink: 0;
+  }
+
+  .rung {
+    flex: 1;
+    height: 40px;
+    overflow: visible;
+  }
+
+  .wire,
+  .contact {
+    stroke: var(--border-color);
+    stroke-width: 2;
+  }
+
+  .pulse {
+    fill: var(--teal);
+    filter: drop-shadow(0 0 4px var(--teal));
+  }
+
+  .rung-label {
+    position: absolute;
+    left: 50%;
+    top: -14px;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--border-color);
+    background: var(--bg-primary);
+    padding: 0 var(--space-xs);
+  }
+</style>

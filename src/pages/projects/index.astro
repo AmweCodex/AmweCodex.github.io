@@ -1,0 +1,82 @@
+---
+/*
+  src/pages/projects/index.astro  →  the page at /projects
+  ------------------------------------------------------------------------
+  Lists EVERY project (not just the homepage's latest 3), grouped into a
+  section per `category` — Astro turns any file at
+  src/pages/projects/index.astro into the route /projects automatically.
+
+  HOW GROUPING WORKS (this is the bit that wasn't working before): each
+  project's frontmatter has a `category` field, e.g. category: "Engineering".
+  That field is now declared in src/content.config.ts, so it actually comes
+  through on entry.data.category. Below, we collect every DISTINCT category
+  in use, then render one section per category with its own heading and
+  grid of cards.
+
+  TO ADD A NEW CATEGORY: just put `category: "Automation"` (or whatever
+  you like) in a project's frontmatter — a new "Automation" section
+  appears on this page automatically, no code changes needed. It's
+  independent of which folder the .md file physically lives in under
+  src/content/projects/ — the folder is only for keeping your own files
+  tidy on disk.
+------------------------------------------------------------------------- */
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const allProjects = await getCollection('projects', ({ data }) => !data.draft);
+
+// Every unique category currently in use, in the order first seen —
+// e.g. ["Engineering", "Automation"]. Add a project with a new category
+// and it just shows up here.
+const categories = [...new Set(allProjects.map((entry) => entry.data.category))];
+
+// Group projects by category, newest-first within each group.
+const projectsByCategory = categories.map((category) => ({
+  category,
+  entries: allProjects
+    .filter((entry) => entry.data.category === category)
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+}));
+---
+
+<Layout title="Projects — Musawandile Shamase" description="Engineering projects by Musawandile Shamase.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow"><span class="led-dot"></span>Projects</p>
+      <h1>All engineering and Industrial Automation [PLC] projects</h1>
+      <p class="page-intro">
+        Prototypes and builds spanning embedded systems, sensors and
+        control logic. Click into any project for the full write-up.
+      </p>
+
+      {projectsByCategory.map(({ category, entries }) => (
+        <div class="category-group">
+          <h2>{category} Projects</h2>
+          <div class="projects-grid">
+            {entries.map((entry) => <ProjectCard entry={entry} />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .page-intro {
+    max-width: 60ch;
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Space between each category's section (e.g. between "Engineering
+     Projects" and "Automation Projects") */
+  .category-group + .category-group {
+    margin-top: var(--space-lg);
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+  }
+</style>

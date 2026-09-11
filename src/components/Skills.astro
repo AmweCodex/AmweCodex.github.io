@@ -1,0 +1,87 @@
+---
+/*
+  Skills.astro
+  ------------------------------------------------------------------------
+  Data-driven section: the skill groups live in the `skillGroups` array
+  below, and the markup just loops over it with .map(). To add or edit a
+  skill later, you only ever touch this array — you don't need to touch
+  any HTML.
+------------------------------------------------------------------------- */
+const skillGroups = [
+  {
+    title: 'Programming',
+    items: ['Python', 'C / C++', 'Arduino C++', 'HTML & CSS', 'Ladder Logic (in progress)'],
+  },
+  {
+    title: 'Engineering & Hardware',
+    items: [
+      'Embedded Systems',
+      'Circuit Design & Troubleshooting',
+      'PCB Assembly (SMT & Through-Hole)',
+      'Soldering',
+      'Digital & Analog Electronics',
+      'Control Systems',
+    ],
+  },
+  {
+    title: 'Industrial Automation',
+    items: [
+      'PLC Programming',
+      'PLC Architecture',
+      'Scan Cycles',
+      'Digital & Analog I/O Configuration',
+      'Ladder Logic',
+      'Timers & Counters',
+      'Automation Fundamentals',
+    ],
+  },
+  {
+    title: 'Software & Tools',
+    items: ['MATLAB', 'Arduino IDE', 'Linux', 'Windows', 'macOS', 'Microsoft Office Suite'],
+  },
+  {
+    title: 'Instruments & Testing',
+    items: ['Oscilloscope', 'Digital Multimeter', 'Calibration & Testing Equipment'],
+  },
+];
+---
+
+<section id="skills" class="section">
+  <div class="container">
+    <p class="eyebrow"><span class="led-dot"></span>Skills</p>
+    <h2>What I work with</h2>
+
+    <div class="skills-grid">
+      {skillGroups.map((group) => (
+        <div class="skill-card card">
+          <h3>{group.title}</h3>
+          <div class="tag-row">
+            {group.items.map((item) => (
+              <span class="tag">{item}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  .skill-card h3 {
+    font-size: 1rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+</style>

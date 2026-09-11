@@ -1,0 +1,46 @@
+---
+/*
+  src/pages/about.astro  →  the page at /about
+  ------------------------------------------------------------------------
+  Skills.astro is unchanged from before — same component, same card
+  styling — it's just imported and rendered here instead of on the
+  homepage now.
+------------------------------------------------------------------------- */
+import Layout from '../layouts/Layout.astro';
+import Skills from '../components/Skills.astro';
+---
+
+<Layout title="About — Musawandile Shamase" description="About Musawandile Shamase — Electronics & Computer Engineering graduate.">
+  <section class="section about-intro">
+    <div class="container narrow">
+      <p class="eyebrow"><span class="led-dot"></span>About</p>
+      <h1>About me</h1>
+      <p>
+        I'm a BEngTech graduate in Electronics &amp; Computer Engineering from
+        the Durban University of Technology, with a technical foundation in
+        embedded systems, electronic circuit design, control systems and
+        software development. I've prototyped projects on microcontrollers
+        and sensors, and I'm now deepening my industrial-automation skillset
+        through a PLC Programming Certification and the FNB App Academy.
+      </p>
+      <p>
+        I like taking a problem from schematic to working prototype, and I'm
+        looking for a junior engineering, industrial automation, or graduate
+        development role where I can keep doing exactly that.
+      </p>
+    </div>
+  </section>
+
+  <!-- Same Skills component and card style as before, just living here now -->
+  <Skills />
+</Layout>
+
+<style>
+  .container.narrow {
+    max-width: 720px;
+  }
+
+  .about-intro p {
+    color: var(--text-color);
+  }
+</style>

@@ -1,0 +1,269 @@
+/*
+  ==========================================================================
+  GLOBAL.CSS
+  ==========================================================================
+  This file holds two things:
+
+  1. "Design tokens" — CSS custom properties (variables) declared once on
+     :root, then reused everywhere else. If you ever want to re-theme the
+     whole site, this is the ONLY place you should need to change colors,
+     fonts, spacing, etc. Every component file reuses these with var(--name).
+
+  2. Base/reset styles — small global rules (box-sizing, default margins,
+     link behaviour, scrollbar, selection color) that every page should get
+     automatically, so we don't repeat them in every component.
+
+  Import this ONCE, in the main layout (src/layouts/Layout.astro), and it
+  applies to every page that uses that layout.
+  ==========================================================================
+*/
+
+:root {
+  /* ---- Your palette, exactly as you specified ------------------------ */
+  --bg-primary: #141d2b;      /* main page background */
+  --bg-secondary: #1a2331;    /* cards, panels, alternating sections */
+  --text-color: #a4b1cd;      /* body copy */
+  --heading-color: #cad2e2;   /* headings, emphasised text */
+  --divider-color: #1a2332;   /* hairlines between sections */
+  --border-color: #4a5466;    /* card borders, input borders */
+  --teal: #07e9b4;            /* the one accent color — use it sparingly */
+
+  /* ---- Derived colors (built FROM your palette, not new colors) ------ */
+  /* These are just your teal/base colors with transparency, so glows,
+     hover states and shadows automatically match your theme. */
+  --teal-glow: rgba(7, 233, 180, 0.18);
+  --teal-border: rgba(7, 233, 180, 0.4);
+  --shadow-color: rgba(5, 8, 14, 0.55);
+
+  /* ---- Type system -----------------------------------------------------
+     Three type "roles", each with a job:
+       --font-display : headings — a geometric, technical-feeling face
+       --font-body    : paragraphs — optimised for reading
+       --font-mono    : labels, tags, code, eyebrows — evokes ladder logic
+                         / datasheets / oscilloscope readouts
+     Loaded as variable webfonts in Layout.astro <head>.
+  ------------------------------------------------------------------------- */
+  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* ---- Spacing scale ---------------------------------------------------
+     Using one consistent scale keeps vertical rhythm predictable.
+     Reach for these instead of inventing random pixel values.
+
+     NOTE: --space-lg and --space-xl were tightened from 4rem/7rem down to
+     2.75rem/4rem. Those two were used for the big vertical paddings —
+     every <section>, the Hero, and the Footer — so 7rem in particular was
+     the reason there was such a large gap between the sticky header and
+     the page content on every page. This one change fixes spacing
+     site-wide since every section reuses these same variables. */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 2.75rem;
+  --space-xl: 4rem;
+
+  /* Max width of the readable content column */
+  --content-width: 1120px;
+}
+
+/* ==========================================================================
+   RESET / BASE STYLES
+   ========================================================================== */
+
+/* Border-box everywhere so padding/border never blow out declared widths */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Respect users who have asked their OS to reduce motion — accessibility */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-color);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--heading-color);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.15;
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 var(--space-sm) 0;
+  /* Justified body copy: text is stretched to fill the full line width,
+     lining up evenly on BOTH the left and right edges (instead of the
+     default "ragged right" edge). Applies site-wide — hero intro, about
+     page, project/blog write-ups, page intros — since they're all plain
+     <p> tags. Short one/two-word labels (eyebrows, tags, dates) aren't
+     visibly affected, since justify only changes how a line WRAPS. */
+  text-align: justify;
+  /* Lets the browser hyphenate a long word instead of stretching a short
+     line into a huge, awkward gap — the usual companion to justify. */
+  hyphens: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Text selection tinted with the brand teal instead of the browser default */
+::selection {
+  background: var(--teal);
+  color: var(--bg-primary);
+}
+
+/* Slim, on-brand scrollbar (Chromium/Edge/Safari) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 6px;
+}
+
+/* Always show a visible focus ring for keyboard users — accessibility.
+   We style it in teal so it still looks intentional, not just a browser
+   default blue outline that clashes with the palette. */
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   SHARED LAYOUT HELPERS
+   Utility classes reused across multiple components, so each component
+   doesn't need to redeclare "how wide is the content column" etc.
+   ========================================================================== */
+
+/* Centers content and caps its width — the standard content wrapper */
+.container {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+/* Small uppercase mono label used above section headings, e.g. "01 — PROJECTS".
+   Mono font + tracked-out letters = datasheet / schematic label feel. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: var(--space-xs);
+}
+
+/* The little square "LED" dot used next to eyebrows/status labels */
+.led-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px 1px var(--teal-glow);
+  flex-shrink: 0;
+}
+
+/* Standard section spacing so every <section> lines up the same way */
+.section {
+  padding: var(--space-xl) 0;
+}
+
+/* Pill-shaped button, filled — used for the primary call to action
+   (Download résumé). */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--teal);
+  color: var(--bg-primary);
+  font-weight: 600;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -6px var(--teal-glow);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--heading-color);
+  border-color: var(--border-color);
+}
+.btn-ghost:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* Card surface reused by project cards, experience entries, etc. */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: var(--space-md);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.card:hover {
+  border-color: var(--teal-border);
+  transform: translateY(-3px);
+}
+
+/* Small pill "tag" used for skill/tech chips */
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  background: var(--bg-primary);
+}

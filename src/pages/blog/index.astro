@@ -1,0 +1,68 @@
+---
+/*
+  src/pages/blog/index.astro  →  the page at /blog
+  ------------------------------------------------------------------------
+  Same grouping approach as src/pages/projects/index.astro — see the
+  comments there for the full explanation. Here it groups blog posts by
+  `category` instead of always being one long PLC-only list, so as your
+  learning journey covers other topics (Electronics, Career, etc.) each
+  gets its own clearly-labelled section. `tags` (already on each post)
+  still show as the small chips on each card for finer-grained labels.
+------------------------------------------------------------------------- */
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// Every unique category currently in use, e.g. ["PLC", "Electronics"].
+const categories = [...new Set(allPosts.map((entry) => entry.data.category))];
+
+// Group posts by category, newest-first within each group.
+const postsByCategory = categories.map((category) => ({
+  category,
+  entries: allPosts
+    .filter((entry) => entry.data.category === category)
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+}));
+---
+
+<Layout title="Blog — Musawandile Shamase" description="Notes from Musawandile Shamase's engineering and PLC learning journey.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow"><span class="led-dot"></span>Blog</p>
+      <h1>Learning journey</h1>
+      <p class="page-intro">
+        Notes and write-ups as I learn — PLC programming, electronics,
+        and whatever else comes up along the way, grouped by topic below.
+      </p>
+
+      {postsByCategory.map(({ category, entries }) => (
+        <div class="category-group">
+          <h2>{category}</h2>
+          <div class="blog-grid">
+            {entries.map((entry) => <BlogCard entry={entry} />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .page-intro {
+    max-width: 60ch;
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Space between each topic's section */
+  .category-group + .category-group {
+    margin-top: var(--space-lg);
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+  }
+</style>

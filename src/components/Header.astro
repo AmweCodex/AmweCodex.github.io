@@ -1,0 +1,152 @@
+---
+/*
+  Header.astro
+  ------------------------------------------------------------------------
+  Sticky top bar: wordmark on the left, jump-links to each section in the
+  middle (desktop only — hidden on small screens to keep mobile tidy,
+  since this is a single scrolling page anyway), and the résumé download
+  button on the right.
+
+  IMPORTANT — how the download button works:
+  The `download` attribute on a plain <a href="..."> tag tells the browser
+  "don't navigate to this URL, download it instead". No JavaScript needed.
+  The file it points to lives in /public/, and anything in /public/ is
+  served from the site root, so "/Musawandile-Shamase-Resume.pdf" works
+  in both local dev and once deployed.
+------------------------------------------------------------------------- */
+/*
+  Real pages now (not just in-page anchors) — clicking "Blog" navigates to
+  the /blog route and opens the blog listing, same for Projects/About.
+  "Contact" stays an anchor since the contact section lives in the
+  Footer, which renders on every page — #contact works from anywhere.
+*/
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/about', label: 'About' },
+  { href: '/#contact', label: 'Contact' },
+];
+
+// Highlights the current page's nav link. Astro.url.pathname is something
+// like "/projects" or "/blog/scan-cycles-explained" — startsWith lets a
+// project/post detail page still highlight the "Projects"/"Blog" tab.
+//
+// BUG FIX: "Contact" points at "/#contact" (an in-page anchor on the
+// homepage, not its own route). The old code did
+// `href.split('#')[0]` on "/#contact", which gives "/" — and EVERY page's
+// path starts with "/", so Contact was permanently marked active/
+// underlined on every page, not just when you were actually on it.
+// Anchor-only links like this never represent "the current page", so we
+// explicitly exclude them (base === '' or base === '/') instead of
+// letting them fall through to startsWith().
+const currentPath = Astro.url.pathname;
+function isActive(href: string) {
+  if (href === '/') return currentPath === '/';
+  const base = href.split('#')[0];
+  if (base === '' || base === '/') return false;
+  return currentPath.startsWith(base);
+}
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo">
+      <span class="logo-bracket">&lt;</span>Amwe<span class="logo-accent">Codex</span><span class="logo-bracket">/&gt;</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Section navigation">
+      {navLinks.map((link) => (
+        <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>{link.label}</a>
+      ))}
+    </nav>
+
+    <a
+      class="btn btn-primary resume-btn"
+      href="/Musawandile-Shamase-Resume.pdf"
+      download="Musawandile-Shamase-Resume.pdf"
+    >
+      Download Resume
+    </a>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(20, 29, 43, 0.85); /* var(--bg-primary) with transparency */
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--divider-color);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--heading-color);
+    letter-spacing: 0.02em;
+  }
+  .logo-bracket {
+    color: var(--border-color);
+  }
+  .logo-accent {
+    color: var(--teal);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+  .nav-links a {
+    color: var(--text-color);
+    transition: color 0.15s ease;
+  }
+  .nav-links a:hover {
+    color: var(--teal);
+  }
+  /* Current page's nav link stays teal, with a small underline, so it's
+     obvious at a glance which section you're in. */
+  .nav-links a[aria-current='page'] {
+    color: var(--teal);
+    position: relative;
+  }
+  .nav-links a[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 2px;
+    background: var(--teal);
+  }
+
+  /* Below 800px: hide the middle nav links to avoid crowding. The page
+     is one continuous scroll, so losing the jump-links isn't a big
+     usability loss on mobile. */
+  @media (max-width: 800px) {
+    .nav-links {
+      display: none;
+    }
+  }
+
+  /* Below 480px: also shrink the resume button label via font-size so it
+     doesn't overflow tiny screens */
+  @media (max-width: 480px) {
+    .resume-btn {
+      font-size: 0.72rem;
+      padding: 0.7rem 1rem;
+    }
+  }
+</style>
