@@ -20,13 +20,13 @@
 
 :root {
   /* ---- Your palette, exactly as you specified ------------------------ */
-  --bg-primary: #141d2b;      /* main page background */
-  --bg-secondary: #1a2331;    /* cards, panels, alternating sections */
-  --text-color: #a4b1cd;      /* body copy */
-  --heading-color: #cad2e2;   /* headings, emphasised text */
-  --divider-color: #1a2332;   /* hairlines between sections */
-  --border-color: #4a5466;    /* card borders, input borders */
-  --teal: #07e9b4;            /* the one accent color — use it sparingly */
+  --bg-primary: #141d2b; /* main page background */
+  --bg-secondary: #1a2331; /* cards, panels, alternating sections */
+  --text-color: #a4b1cd; /* body copy */
+  --heading-color: #cad2e2; /* headings, emphasised text */
+  --divider-color: #1a2332; /* hairlines between sections */
+  --border-color: #4a5466; /* card borders, input borders */
+  --teal: #07e9b4; /* the one accent color — use it sparingly */
 
   /* ---- Derived colors (built FROM your palette, not new colors) ------ */
   /* These are just your teal/base colors with transparency, so glows,
@@ -43,9 +43,9 @@
                          / datasheets / oscilloscope readouts
      Loaded as variable webfonts in Layout.astro <head>.
   ------------------------------------------------------------------------- */
-  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
-  --font-body: 'Inter', 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-body: "Inter", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "Courier New", monospace;
 
   /* ---- Spacing scale ---------------------------------------------------
      Using one consistent scale keeps vertical rhythm predictable.
@@ -106,7 +106,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: var(--font-display);
   color: var(--heading-color);
   margin: 0 0 var(--space-sm) 0;
@@ -220,7 +223,10 @@ img {
   border-radius: 999px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
 }
 
 .btn-primary {
@@ -249,7 +255,9 @@ img {
   border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: var(--space-md);
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 .card:hover {
   border-color: var(--teal-border);
@@ -266,4 +274,56 @@ img {
   border: 1px solid var(--border-color);
   color: var(--text-color);
   background: var(--bg-primary);
+}
+
+/* Markdown table styling */
+.prose table,
+article table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.prose thead,
+article thead {
+  background-color: #1a2331; /* secondary_bg */
+}
+
+.prose th,
+article th {
+  color: #cad2e2; /* heading_color */
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #4a5466 !important;
+}
+
+.prose td,
+article td {
+  color: #a4b1cd; /* text_color */
+  padding: 0.75rem 1rem;
+  vertical-align: top;
+  border-bottom: 1px solid #1a2332 !important;
+}
+
+.prose tr:hover td,
+article tr:hover td {
+  background-color: rgba(7, 233, 180, 0.05); /* subtle teal hover */
+}
+
+/* Make tables scroll horizontally on small screens instead of breaking layout */
+.prose table,
+article table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .prose table,
+  article table {
+    display: table;
+    white-space: normal;
+  }
 }
