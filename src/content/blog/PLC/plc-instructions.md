@@ -27,7 +27,7 @@ Ladder logic is built from a small set of core instructions. Once you understand
 
 - If the referenced bit is `1`, the XIC instruction is `TRUE` and allows power/logic flow to continue along the rung.
 - If the referenced bit is `0`, the XIC instruction is `FALSE` and blocks flow along that rung path.
-- Named after the physical device it represents — a normally open contact that only "closes" (allows current through) when energised.
+- Named after the physical device it represents — a normally open contact that only "closes" (allows current through) when energized.
 
 ### XIO - Examine If Open
 
@@ -75,9 +75,21 @@ Timers extend these basic instructions by adding a **time delay** to the equatio
 
 I've covered timers in detail — including TON, TOF, and TP with wiring examples and a comparison table — in a dedicated post here: [PLC Timers](https://amwecodex.netlify.app/blog/plc/plc-timers)
 
+### Counters  
+1. **Count Up (CTU)**: Increments the accumulator value by 1 on each rising edge of the count input until it reaches the preset value, activating the output.
+2. **Count Down (CTD)**: Decrements the accumulator value by 1 from a loaded preset value down to zero or below.  
+
+**Core ConceptsEvent-Driven**:  
+Unlike timers that measure time, counters track off-to-on (rising edge) transitions of an input signal rather than duration.  
+
+**Accumulator (`ACC`)**: The internal memory register that stores the current counted value.  
+**Preset Value (`PRE`)**: The target number set by the programmer.   
+When the accumulator reaches or exceeds this limit, the counter's "Done" (`DN`) status bit turns on.   
+**Reset (`R`)**: A dedicated input used to clear the accumulated value back to zero.
+
 ## Quick Comparison
 
-| Instruction | Type   | Behaviour                                               |
+| Instruction | Type   | Behavior                                               |
 | ----------- | ------ | ------------------------------------------------------- |
 | **XIC**     | Input  | TRUE when bit = 1 (like a NO contact)                   |
 | **XIO**     | Input  | TRUE when bit = 0 (like a NC contact)                   |
