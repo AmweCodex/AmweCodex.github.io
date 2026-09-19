@@ -1,0 +1,6 @@
+# Tells search engines they may crawl everything, and where the sitemap is.
+# The sitemap is generated automatically on every build (see astro.config.mjs).
+User-agent: *
+Allow: /
+
+Sitemap: https://amwecodex.netlify.app/sitemap-index.xml

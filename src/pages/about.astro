@@ -16,7 +16,7 @@ import Skills from '../components/Skills.astro';
       <p class="eyebrow"><span class="led-dot"></span>About</p>
       <h1>About me</h1>
       <p>
-        I'm a <strong style="color: #cad2e2;">BEngTech</strong> graduate in <strong style="color: #cad2e2;">Electronics &amp; Computer Engineering</strong> from the <strong style="color: #cad2e2;">Durban University of Technology</strong>, with a foundation spanning
+        I'm a <strong>BEngTech</strong> graduate in <strong>Electronics &amp; Computer Engineering</strong> from the <strong>Durban University of Technology</strong>, with a foundation spanning
         embedded systems, electronic circuit design, control systems and
         software development, built through modules like Electronic Circuit
         Design, Digital Signal Processing and Fundamentals of Control
@@ -50,5 +50,11 @@ import Skills from '../components/Skills.astro';
 
   .about-intro p {
     color: var(--text-color);
+  }
+
+  /* Highlighted words in the intro. This used to be a fixed colour typed
+     into each <strong>, which would be unreadable in the light theme. */
+  .about-intro strong {
+    color: var(--heading-color);
   }
 </style>

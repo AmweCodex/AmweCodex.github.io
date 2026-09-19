@@ -20,12 +20,28 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  // Picture shown when the page is shared on LinkedIn, WhatsApp, X, etc.
+  // Path from /public, e.g. "/images/blog/plc-timers.jpg". Blog and project
+  // pages pass their cover image; every other page uses your profile photo.
+  image?: string;
+  // "article" for blog posts and project write-ups, "website" for the rest.
+  type?: 'website' | 'article';
 }
 
 const {
   title,
   description = 'Portfolio of Musawandile Shamase — Electronics & Computer Engineering graduate specialising in embedded systems and industrial automation (PLCs).',
+  image = '/profile.jpg',
+  type = 'website',
 } = Astro.props;
+
+// Social sites need FULL links (with https://...), not just "/profile.jpg".
+// Astro.site comes from the `site` setting in astro.config.mjs.
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = new URL(image, Astro.site);
+
+// A square photo looks best as a small card; a wide cover as a big card.
+const twitterCard = image === '/profile.jpg' ? 'summary' : 'summary_large_image';
 ---
 
 <!doctype html>
@@ -37,6 +53,94 @@ const {
 
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!--
+      Google Search Console ownership check. This used to sit inside
+      Header.astro, which put it in the <body>. Google wants it in the
+      <head>, so it lives here now.
+    -->
+    <meta name="google-site-verification" content="M8KQCZUr4v81uMOiWmPxR-fHiICREXOsorjVuL3iiYY" />
+
+    <!--
+      Social previews (Open Graph + X/Twitter card). When someone pastes a
+      link to a page on LinkedIn or WhatsApp, these tags decide the title,
+      the short description and the picture that show up.
+    -->
+    <meta property="og:site_name" content="AmweCodex" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={imageURL} />
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageURL} />
+
+    <!--
+      THEME (light / dark) — this MUST stay in the <head>, before the page
+      is drawn. It decides the theme first, so a visitor who prefers light
+      never sees a quick dark flash before the page switches.
+
+      How it works:
+        - The choice is saved in localStorage under the key "theme":
+          "light" or "dark". If nothing is saved, the mode is "auto" and
+          we follow the visitor's device setting.
+        - The result is written to <html data-theme="light|dark">, which
+          global.css uses to swap the colours.
+        - <html data-theme-pref="auto|light|dark"> remembers what the
+          visitor CHOSE, so the toggle button shows the right icon.
+        - window.__setTheme() is used by the toggle button in the header.
+
+      To make the site start in dark instead of following the device,
+      change the fallback in readSaved() from 'auto' to 'dark'.
+    -->
+    <meta name="theme-color" content="#141d2b" />
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        var media = window.matchMedia('(prefers-color-scheme: dark)');
+        var BAR_COLOURS = { dark: '#141d2b', light: '#f4f7fb' };
+
+        function readSaved() {
+          try {
+            var saved = localStorage.getItem('theme');
+            return saved === 'light' || saved === 'dark' ? saved : 'auto';
+          } catch (e) {
+            return 'auto'; // storage blocked (private mode etc.)
+          }
+        }
+
+        function apply(pref) {
+          var theme = pref === 'auto' ? (media.matches ? 'dark' : 'light') : pref;
+          root.dataset.theme = theme;
+          root.dataset.themePref = pref;
+          // Colours the phone's browser bar to match the page
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', BAR_COLOURS[theme]);
+        }
+
+        window.__setTheme = function (pref) {
+          try {
+            if (pref === 'auto') localStorage.removeItem('theme');
+            else localStorage.setItem('theme', pref);
+          } catch (e) {}
+          apply(pref);
+        };
+
+        apply(readSaved());
+
+        // In "auto" mode, follow the device if it switches (e.g. at sunset)
+        media.addEventListener('change', function () {
+          if (readSaved() === 'auto') apply('auto');
+        });
+        // Keep several open tabs in step with each other
+        window.addEventListener('storage', function (e) {
+          if (e.key === 'theme') apply(readSaved());
+        });
+      })();
+    </script>
 
     <!--
       Fonts: loaded from Google Fonts as variable fonts.
@@ -64,5 +168,10 @@ const {
     </main>
 
     <Footer />
+
+    <!-- Adds a "Copy" button to every code block in posts and projects -->
+    <script>
+      import '../scripts/copy-code.ts';
+    </script>
   </body>
 </html>

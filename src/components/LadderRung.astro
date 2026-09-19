@@ -68,6 +68,10 @@ const { label = '' } = Astro.props;
 
   .rung {
     flex: 1;
+    /* Lets the wire shrink on narrow screens. Without this, a flex item
+       refuses to go smaller than its own drawing (about 450px wide), which
+       pushed the home page sideways on phones. */
+    min-width: 0;
     height: 40px;
     overflow: visible;
   }

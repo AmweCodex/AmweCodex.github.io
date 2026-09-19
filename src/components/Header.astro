@@ -1,11 +1,14 @@
 ---
+import ThemeToggle from './ThemeToggle.astro';
 /*
   Header.astro
   ------------------------------------------------------------------------
-  Sticky top bar: wordmark on the left, jump-links to each section in the
-  middle (desktop only — hidden on small screens to keep mobile tidy,
-  since this is a single scrolling page anyway), and the résumé download
-  button on the right.
+  Sticky top bar: wordmark on the left, links to each page in the middle,
+  and on the right: the light/dark toggle, the résumé download button and
+  (on small screens only) a menu button.
+
+  On phones and small tablets the middle links are replaced by a menu
+  button that opens a dropdown with the same links.
 
   IMPORTANT — how the download button works:
   The `download` attribute on a plain <a href="..."> tag tells the browser
@@ -50,26 +53,63 @@ function isActive(href: string) {
 ---
 
 <header class="site-header">
-  <meta name="google-site-verification" content="M8KQCZUr4v81uMOiWmPxR-fHiICREXOsorjVuL3iiYY" />
   <div class="container header-inner">
     <a href="/" class="logo">
       <span class="logo-bracket">&lt;</span>Amwe<span class="logo-accent">Codex</span><span class="logo-bracket">/&gt;</span>
     </a>
 
+    <!-- Desktop links (hidden on small screens) -->
     <nav class="nav-links" aria-label="Section navigation">
       {navLinks.map((link) => (
         <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>{link.label}</a>
       ))}
     </nav>
 
-    <a
-      class="btn btn-primary resume-btn"
-      href="/Musawandile-Shamase-Resume.pdf"
-      download="Musawandile-Shamase-Resume.pdf"
-    >
-      Download Resume
-    </a>
+    <div class="header-actions">
+      <ThemeToggle />
+
+      <a
+        class="btn btn-primary resume-btn"
+        href="/Musawandile-Shamase-Resume.pdf"
+        download="Musawandile-Shamase-Resume.pdf"
+      >
+        Download Resume
+      </a>
+
+      <!-- Menu button: only visible on small screens -->
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
   </div>
+
+  <!--
+    Dropdown menu for small screens. It uses the same navLinks list as the
+    desktop nav, so you only ever edit the links in one place (top of this
+    file). The `hidden` attribute keeps it closed until the button is used.
+  -->
+  <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile navigation" hidden>
+    <div class="container mobile-menu-inner">
+      {navLinks.map((link) => (
+        <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>{link.label}</a>
+      ))}
+      <a
+        class="btn btn-primary mobile-resume"
+        href="/Musawandile-Shamase-Resume.pdf"
+        download="Musawandile-Shamase-Resume.pdf"
+      >
+        Download Resume
+      </a>
+    </div>
+  </nav>
 </header>
 
 <style>
@@ -77,7 +117,7 @@ function isActive(href: string) {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(20, 29, 43, 0.85); /* var(--bg-primary) with transparency */
+    background: var(--header-bg); /* page colour with transparency, set per theme */
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--divider-color);
   }
@@ -133,21 +173,157 @@ function isActive(href: string) {
     background: var(--teal);
   }
 
-  /* Below 800px: hide the middle nav links to avoid crowding. The page
-     is one continuous scroll, so losing the jump-links isn't a big
-     usability loss on mobile. */
+  /* Right-hand group: theme toggle, résumé button, menu button */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* ---- Menu button (three bars that turn into an X) ------------------ */
+  .menu-toggle {
+    display: none; /* only shown on small screens, see media query below */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+  .menu-toggle:hover {
+    border-color: var(--teal);
+  }
+  .menu-toggle .bar {
+    display: block;
+    width: 1rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--heading-color);
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+  }
+  /* When open: top bar and bottom bar cross into an X, middle bar fades */
+  .menu-toggle[aria-expanded='true'] .bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .menu-toggle[aria-expanded='true'] .bar:nth-child(2) {
+    opacity: 0;
+  }
+  .menu-toggle[aria-expanded='true'] .bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* ---- Dropdown panel ------------------------------------------------- */
+  .mobile-menu {
+    position: absolute; /* sits right under the header bar */
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-primary); /* solid, so text behind never shows through */
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 18px 30px -18px var(--shadow-color);
+  }
+  .mobile-menu-inner {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--space-xs);
+    padding-bottom: var(--space-sm);
+  }
+  .mobile-menu-inner a:not(.btn) {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--text-color);
+    padding: 0.85rem 0; /* big enough to tap comfortably */
+    border-bottom: 1px solid var(--divider-color);
+  }
+  .mobile-menu-inner a:not(.btn):hover {
+    color: var(--teal);
+  }
+  .mobile-menu-inner a[aria-current='page'] {
+    color: var(--teal);
+  }
+  .mobile-resume {
+    justify-content: center;
+    margin-top: var(--space-sm);
+  }
+
+  /* ---- Small screens --------------------------------------------------
+     Below 800px the middle links are replaced by the menu button. */
   @media (max-width: 800px) {
     .nav-links {
       display: none;
     }
+    .menu-toggle {
+      display: inline-flex;
+    }
   }
 
-  /* Below 480px: also shrink the resume button label via font-size so it
-     doesn't overflow tiny screens */
-  @media (max-width: 480px) {
+  /* Above 800px the dropdown must never show, even if it was left open
+     and the window was then made wider. */
+  @media (min-width: 801px) {
+    .mobile-menu {
+      display: none;
+    }
+  }
+
+  /* Below 560px there is no room for the résumé button in the top bar,
+     so it moves into the dropdown instead. */
+  @media (max-width: 560px) {
     .resume-btn {
-      font-size: 0.72rem;
-      padding: 0.7rem 1rem;
+      display: none;
+    }
+  }
+  @media (min-width: 561px) {
+    .mobile-resume {
+      display: none;
     }
   }
 </style>
+
+<script>
+  // Opens and closes the mobile dropdown menu.
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+
+  function setOpen(open: boolean) {
+    if (!toggle || !menu) return;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    menu.hidden = !open;
+  }
+
+  toggle?.addEventListener('click', () => {
+    setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+
+  // Close after choosing a link (needed for the "Contact" link, which
+  // scrolls on the same page instead of loading a new one)
+  menu?.addEventListener('click', (event) => {
+    if ((event.target as HTMLElement).closest('a')) setOpen(false);
+  });
+
+  // Close when tapping anywhere outside the header
+  document.addEventListener('click', (event) => {
+    if (!(event.target as HTMLElement).closest('.site-header')) setOpen(false);
+  });
+
+  // Close with the Escape key, and put focus back on the button
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+
+  // If the window grows past the mobile size, reset the menu
+  window.matchMedia('(min-width: 801px)').addEventListener('change', (event) => {
+    if (event.matches) setOpen(false);
+  });
+</script>

@@ -35,6 +35,18 @@
   --teal-border: rgba(7, 233, 180, 0.4);
   --shadow-color: rgba(5, 8, 14, 0.55);
 
+  /* ---- Surface tokens added for theming --------------------------------
+     These used to be typed straight into the header, the tables and the
+     code blocks. Now every theme-dependent colour lives here, so the
+     light theme below only has to override this one list. */
+  --header-bg: rgba(20, 29, 43, 0.85); /* sticky header, see-through */
+  --code-bg: #0f1724; /* code blocks in blog posts */
+  --hover-tint: rgba(7, 233, 180, 0.05); /* table row hover */
+
+  /* Tells the browser this is a dark page, so built-in things (form
+     controls, the default scrollbar, text-selection handles) match. */
+  color-scheme: dark;
+
   /* ---- Type system -----------------------------------------------------
      Three type "roles", each with a job:
        --font-display : headings — a geometric, technical-feeling face
@@ -65,6 +77,39 @@
 
   /* Max width of the readable content column */
   --content-width: 1120px;
+}
+
+/* ==========================================================================
+   LIGHT THEME
+   ==========================================================================
+   Applied when <html data-theme="light"> is set. That attribute is set by
+   the tiny script in Layout.astro (before the page paints, so there is no
+   flash), and it follows the visitor's choice from the toggle in the
+   header — or their device setting when the toggle is on "Auto".
+
+   Only colours change here. Fonts and spacing stay exactly as they are.
+   The teal is darker in this theme on purpose: the bright #07e9b4 is
+   nearly invisible on a light background. #007a5e passes the WCAG AA
+   contrast check (4.5:1) for text on both the page and the cards.
+   ========================================================================== */
+:root[data-theme="light"] {
+  --bg-primary: #f4f7fb; /* page background */
+  --bg-secondary: #ffffff; /* cards and panels */
+  --text-color: #455068; /* body copy (7.5:1 on the page background) */
+  --heading-color: #141d2b; /* headings: your dark navy, flipped to text */
+  --divider-color: #e1e7f0; /* hairlines */
+  --border-color: #c3cbd9; /* card and input borders */
+  --teal: #007a5e; /* accent, darker so it stays readable */
+
+  --teal-glow: rgba(0, 122, 94, 0.16);
+  --teal-border: rgba(0, 122, 94, 0.45);
+  --shadow-color: rgba(20, 29, 43, 0.14);
+
+  --header-bg: rgba(244, 247, 251, 0.85);
+  --code-bg: #eaf0f7;
+  --hover-tint: rgba(0, 122, 94, 0.07);
+
+  color-scheme: light;
 }
 
 /* ==========================================================================
@@ -287,29 +332,29 @@ article table {
 
 .prose thead,
 article thead {
-  background-color: #1a2331; /* secondary_bg */
+  background-color: var(--bg-secondary);
 }
 
 .prose th,
 article th {
-  color: #cad2e2; /* heading_color */
+  color: var(--heading-color);
   text-align: left;
   padding: 0.75rem 1rem;
   font-weight: 600;
-  border: 1px solid #4a5466 !important; /* border_color, all sides */
+  border: 1px solid var(--border-color) !important; /* all sides */
   border-bottom-width: 2px !important; /* keeps the thicker line under the header */
 }
 
 .prose td,
 article td {
-  color: #a4b1cd; /* text_color */
+  color: var(--text-color);
   padding: 0.75rem 1rem;
   vertical-align: top;
-  border: 1px solid #4a5466 !important; /* border_color, all sides */
+  border: 1px solid var(--border-color) !important; /* all sides */
 }
 .prose tr:hover td,
 article tr:hover td {
-  background-color: rgba(7, 233, 180, 0.05); /* subtle teal hover */
+  background-color: var(--hover-tint); /* subtle teal hover */
 }
 
 /* Make tables scroll horizontally on small screens instead of breaking layout */
@@ -357,4 +402,81 @@ article ul li::before {
 article ol li::marker {
   color: var(--teal);
   font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   CODE BLOCKS  (fenced ``` blocks inside blog posts and project write-ups)
+   ==========================================================================
+   Astro colours the code with Shiki. In astro.config.mjs we asked for TWO
+   colour themes (dark + light), so every coloured word carries both colours
+   as CSS variables: --shiki-dark and --shiki-light. Here we simply pick the
+   one that matches the current site theme.
+   ========================================================================== */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-dark);
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+  text-decoration: var(--shiki-dark-text-decoration);
+}
+:root[data-theme="light"] .astro-code,
+:root[data-theme="light"] .astro-code span {
+  color: var(--shiki-light);
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+
+/* The block itself. The background comes from our own --code-bg so it
+   always matches the site, whatever the code theme wants. */
+.prose pre.astro-code {
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin: 0;
+  overflow-x: auto; /* long lines scroll sideways instead of breaking the page */
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  text-align: left;
+  tab-size: 2;
+}
+
+/* Undo the "inline code" pill style (border, padding, background) for code
+   that sits inside a block. Without this every block looks like a chip. */
+.prose pre.astro-code code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Wrapper added by the copy-button script (src/scripts/copy-code.ts) */
+.code-block {
+  position: relative;
+  margin: var(--space-md) 0;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-color);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.copy-btn:hover,
+.copy-btn[data-copied] {
+  border-color: var(--teal);
+  color: var(--teal);
 }
