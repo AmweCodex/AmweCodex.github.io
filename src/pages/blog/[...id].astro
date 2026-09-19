@@ -31,7 +31,7 @@ const formattedDate = date.toLocaleDateString('en-GB', {
 });
 ---
 
-<Layout title={`${title} — Musawandile Shamase`} description={entry.data.summary}>
+<Layout title={`${title}`} description={entry.data.summary}>
   <article class="section post-detail">
     <div class="container narrow">
       <a class="back-link" href="/blog">&larr; All posts</a>
@@ -58,7 +58,7 @@ const formattedDate = date.toLocaleDateString('en-GB', {
 
 <style>
   .container.narrow {
-    max-width: 760px;
+    max-width: max(760px, 75%);
   }
 
   .back-link {
