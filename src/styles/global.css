@@ -296,7 +296,8 @@ article th {
   text-align: left;
   padding: 0.75rem 1rem;
   font-weight: 600;
-  border-bottom: 2px solid #4a5466 !important;
+  border: 1px solid #4a5466 !important; /* border_color, all sides */
+  border-bottom-width: 2px !important; /* keeps the thicker line under the header */
 }
 
 .prose td,
@@ -304,9 +305,8 @@ article td {
   color: #a4b1cd; /* text_color */
   padding: 0.75rem 1rem;
   vertical-align: top;
-  border-bottom: 1px solid #1a2332 !important;
+  border: 1px solid #4a5466 !important; /* border_color, all sides */
 }
-
 .prose tr:hover td,
 article tr:hover td {
   background-color: rgba(7, 233, 180, 0.05); /* subtle teal hover */
@@ -326,4 +326,35 @@ article table {
     display: table;
     white-space: normal;
   }
+}
+
+/* Markdown bullet points: glowing teal "LED" dots */
+.prose ul,
+article ul {
+  list-style: none; /* hide the default bullet */
+}
+
+.prose ul li,
+article ul li {
+  position: relative;
+}
+
+.prose ul li::before,
+article ul li::before {
+  content: "";
+  position: absolute;
+  left: -1.05rem; /* sits in the list's left padding */
+  top: 0.7em;     /* lines up with the first line of text */
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px 1px var(--teal-glow);
+}
+
+/* Numbered lists: teal numbers (no glow possible on these) */
+.prose ol li::marker,
+article ol li::marker {
+  color: var(--teal);
+  font-family: var(--font-mono);
 }
