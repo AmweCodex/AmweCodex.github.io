@@ -8,7 +8,7 @@ export default defineConfig({
   // The live address of the site. Astro needs this to build the sitemap
   // and the full links used in social previews (Open Graph tags).
   // If you move to your own domain, change it here and nowhere else.
-  site: 'https://amwecodex.netlify.app',
+  site: 'https://amwecodex.github.io',
 
   integrations: [sitemap()],
 
