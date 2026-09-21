@@ -132,7 +132,7 @@ _Even if a button is held down for ten seconds, the one-shot only fires for a si
 
 Timers extend these basic instructions by adding a **time delay** to the equation instead of an instant true/false response. Where XIC/OTE act immediately on the current rung state, timers like TON, TOF, and TP let you build delays, run-on periods, and fixed pulses into your logic.
 
-I've covered timers in detail — including TON, TOF, and TP with wiring examples and a comparison table — in a dedicated post here: [PLC Timers](https://amwecodex.netlify.app/blog/plc/plc-timers)
+I've covered timers in detail — including TON, TOF, and TP with wiring examples and a comparison table — in a dedicated post here: [PLC Timers](https://amwecodex.github.io/blog/plc/plc-timers)
 
 ## Counters
 
