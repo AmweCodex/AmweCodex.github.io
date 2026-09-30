@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://amwecodex.netlify.app/</loc>
+    <loc>https://amwecodex.github.io/</loc>
     <lastmod>2026-09-16T03:05:04+00:00</lastmod>
     <priority>1.0000</priority>
   </url>
   <url>
-    <loc>https://amwecodex.netlify.app/Musawandile-Shamase-Resume.pdf</loc>
+    <loc>https://amwecodex.github.io/Musawandile-Shamase-Resume.pdf</loc>
     <lastmod>2026-09-16T03:05:04+00:00</lastmod>
     <priority>0.8000</priority>
   </url>
   <url>
-    <loc>https://amwecodex.netlify.app/projects/</loc>
+    <loc>https://amwecodex.github.io/projects/</loc>
     <lastmod>2026-09-16T03:05:04+00:00</lastmod>
     <priority>0.6400</priority>
   </url>
   <url>
-    <loc>https://amwecodex.netlify.app/blog/</loc>
+    <loc>https://amwecodex.github.io/blog/</loc>
     <lastmod>2026-09-16T03:05:04+00:00</lastmod>
     <priority>0.6400</priority>
   </url>
   <url>
-    <loc>https://amwecodex.netlify.app/about/</loc>
+    <loc>https://amwecodex.github.io/about/</loc>
     <lastmod>2026-09-16T03:05:04+00:00</lastmod>
     <priority>0.6400</priority>
   </url>
   <url>
-    <loc>https://amwecodex.netlify.app/blog/plc/io-inputs-and-outputs/</loc>
+    <loc>https://amwecodex.github.io/blog/plc/io-inputs-and-outputs/</loc>
     <lastmod>2026-09-16T03:05:04+00:00</lastmod>
     <priority>0.6400</priority>
   </url>
   <url>
-    <loc>https://amwecodex.netlify.app/blog/plc/plc-instructions/</loc>
+    <loc>https://amwecodex.github.io/blog/plc/plc-instructions/</loc>
     <lastmod>2026-09-16T03:05:04+00:00</lastmod>
     <priority>0.6400</priority>
   </url>
   <url>
-    <loc>https://amwecodex.netlify.app/blog/plc/plc-timers/</loc>
+    <loc>https://amwecodex.github.io/blog/plc/plc-timers/</loc>
     <lastmod>2026-09-16T03:05:04+00:00</lastmod>
     <priority>0.6400</priority>
   </url>

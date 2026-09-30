@@ -3,4 +3,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://amwecodex.netlify.app/sitemap-index.xml
+Sitemap: https://amwecodex.github.io/sitemap.xml
