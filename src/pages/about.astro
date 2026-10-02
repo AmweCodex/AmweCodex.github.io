@@ -8,6 +8,7 @@
 ------------------------------------------------------------------------- */
 import Layout from '../layouts/Layout.astro';
 import Skills from '../components/Skills.astro';
+import CertificatesSection from '../components/CertificatesSection.astro';
 ---
 
 <Layout title="About — Musawandile Shamase" description="About Musawandile Shamase — Electronics & Computer Engineering graduate.">
@@ -32,12 +33,15 @@ import Skills from '../components/Skills.astro';
       </p>
       <p>
         I'm currently deepening my industrial-automation skills through a
-        PLC Programming Certification, and teaching myself further with
-        free tools like CODESYS and many other platforms, documenting the whole journey here as I
+        PLC Programming Certification and i've completed <strong>PLC Fundamentals (Level I)</strong> certificate, and iam teaching myself further with
+        free tools like RSLogix 500 and many other platforms, documenting the whole journey here as I
         go, one project and blog post at a time.
       </p>
     </div>
   </section>
+  
+  <!-- Certificates: one card per file in src/content/certificates/ -->
+  <CertificatesSection />
 
   <!-- Same Skills component and card style as before, just living here now -->
   <Skills />

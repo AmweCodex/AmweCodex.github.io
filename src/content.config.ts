@@ -1,6 +1,6 @@
 // src/content.config.ts
 // ============================================================================
-// This file defines your two "content collections": projects and blog.
+// This file defines your three "content collections": projects, blog and certificates.
 // A collection is just a folder of markdown files (src/content/projects/ and
 // src/content/blog/) that all share the same frontmatter shape.
 //
@@ -70,4 +70,34 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { projects, blog };
+// ---- Certificates ---------------------------------------------------------
+// One .md file per certificate in src/content/certificates/. The About page
+// reads this collection and draws a card for each one, newest first, so
+// adding a certificate never means touching any .astro code.
+const certificates = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/certificates' }),
+  schema: z.object({
+    // Name of the certificate, e.g. "PLC Fundamentals (Level I)"
+    title: z.string(),
+    // Who issued it, e.g. "PLC Dojo"
+    provider: z.string(),
+    // Date it was issued (YYYY-MM-DD)
+    date: z.coerce.date(),
+    // One or two sentences on what the certificate covers
+    summary: z.string(),
+    // Picture of the certificate, relative to /public,
+    // e.g. "/images/certificates/plc-fundamentals-level-1.jpg"
+    image: z.string(),
+    // Optional: the provider's public page that proves the certificate is real
+    link: z.string().url().optional(),
+    // Optional: the PDF copy, relative to /public,
+    // e.g. "/certificates/plc-fundamentals-level-1.pdf"
+    pdf: z.string().optional(),
+    // Optional chips shown on the card, e.g. ["Ladder Logic", "HMI"]
+    skills: z.array(z.string()).default([]),
+    // Set draft: true to hide a certificate without deleting it
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { projects, blog, certificates };

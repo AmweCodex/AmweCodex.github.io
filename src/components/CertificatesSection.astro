@@ -1,0 +1,171 @@
+---
+/*
+  CertificatesSection.astro
+  ------------------------------------------------------------------------
+  Draws one card for every file in src/content/certificates/, newest first.
+  You never edit this file to add a certificate — you only add a new .md
+  file (or run `npm run new:certificate`). See src/content.config.ts for
+  the list of fields each certificate file can have.
+
+  Not to be confused with Certifications.astro, which is the homepage
+  "Education & Certifications" summary.
+------------------------------------------------------------------------- */
+import { getCollection } from 'astro:content';
+
+// Hide drafts, then sort so the newest certificate comes first.
+const certificates = (await getCollection('certificates', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+// "2 October 2026" — plain, South African style date.
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+{certificates.length > 0 && (
+  <section id="certificates" class="section certificates-section">
+    <div class="container">
+      <p class="eyebrow"><span class="led-dot"></span>Certificates</p>
+      <h2>Proof of the learning</h2>
+
+      <div class="certificates-grid">
+        {certificates.map(({ data }) => (
+          <article class="certificate-card card">
+            <!-- The picture also opens the PDF (or the verify link) when clicked -->
+            <a
+              class="certificate-thumb"
+              href={data.pdf ?? data.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Open the ${data.title} certificate`}
+            >
+              <img src={data.image} alt={`${data.title} certificate from ${data.provider}`} loading="lazy" />
+            </a>
+
+            <div class="certificate-body">
+              <h3>{data.title}</h3>
+              <p class="certificate-meta">{data.provider} · Issued {formatDate(data.date)}</p>
+              <p class="certificate-summary">{data.summary}</p>
+
+              {data.skills.length > 0 && (
+                <div class="tag-row">
+                  {data.skills.map((skill) => <span class="tag">{skill}</span>)}
+                </div>
+              )}
+
+              {(data.link || data.pdf) && (
+                <div class="certificate-actions">
+                  {data.link && (
+                    <a class="btn btn-primary" href={data.link} target="_blank" rel="noopener noreferrer">
+                      Verify online
+                    </a>
+                  )}
+                  {data.pdf && (
+                    <a class="btn btn-ghost" href={data.pdf} target="_blank" rel="noopener noreferrer">
+                      View PDF
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  /* Thin divider lines above and below, same look as the other alternating sections */
+  .certificates-section {
+    border-top: 1px solid var(--divider-color);
+    border-bottom: 1px solid var(--divider-color);
+  }
+
+  .certificates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  /* The cards are taller than other cards, so the global lift-on-hover
+     would feel jumpy — keep the border highlight, drop the movement. */
+  .certificate-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background: var(--bg-primary);
+  }
+  .certificate-card:hover {
+    transform: none;
+  }
+
+  .certificate-thumb {
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    aspect-ratio: 1287 / 909; /* matches the certificate picture, so nothing jumps while it loads */
+  }
+  .certificate-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .certificate-thumb:hover img {
+    transform: scale(1.03);
+  }
+
+  .certificate-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-xs) var(--space-xs);
+  }
+  .certificate-body h3 {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  .certificate-meta {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--teal);
+    margin: 0;
+  }
+  .certificate-summary {
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: var(--space-xs);
+  }
+
+  .certificate-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+  }
+  .certificate-actions .btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .certificate-thumb img {
+      transition: none;
+    }
+    .certificate-thumb:hover img {
+      transform: none;
+    }
+  }
+</style>
