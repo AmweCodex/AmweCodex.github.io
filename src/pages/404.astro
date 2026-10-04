@@ -17,17 +17,44 @@ import Layout from '../layouts/Layout.astro';
 >
   <section class="section not-found">
     <div class="container narrow">
-      <p class="eyebrow"><span class="led-dot"></span>Error 404</p>
-      <h1>Rung not found</h1>
-      <p>
-        This page does not exist, or it has moved. There is no power flow on
-        this rung, so let's get you back to a live one.
-      </p>
+      <div class="plc-fault-card">
+        <!-- Schematic / Ladder rail decoration -->
+        <div class="ladder-rail top"></div>
+        
+        <div class="content-wrapper">
+          <div class="status-badge">
+            <span class="led-dot active"></span>
+            <span>PLC Fault: Address Error [404]</span>
+          </div>
 
-      <div class="actions">
-        <a class="btn btn-primary" href="/">Back to home</a>
-        <a class="btn btn-ghost" href="/blog">Read the blog</a>
-        <a class="btn btn-ghost" href="/projects">See projects</a>
+          <h1 class="glitch-title">Rung Not Found</h1>
+          
+          <p class="description">
+            The power flow has been interrupted. This address doesn't exist in the scan cycle or has been relocated to a new memory register.
+          </p>
+
+          <!-- Simulated Broken Ladder Rung Graphic -->
+          <div class="ladder-graphic" aria-hidden="true">
+            <div class="rail left"></div>
+            <div class="rung-content">
+              <span class="contact open">--[ / ]--</span>
+              <span class="fault-text">FAULT (ERR_404)</span>
+              <span class="output dead">( ) OUT</span>
+            </div>
+            <div class="rail right"></div>
+          </div>
+
+          <div class="actions">
+            <a class="btn btn-primary" href="/">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+              Back to Home
+            </a>
+            <a class="btn btn-ghost" href="/blog">Read the Blog</a>
+            <a class="btn btn-ghost" href="/projects">See Projects</a>
+          </div>
+        </div>
+
+        <div class="ladder-rail bottom"></div>
       </div>
     </div>
   </section>
@@ -35,19 +62,143 @@ import Layout from '../layouts/Layout.astro';
 
 <style>
   .not-found {
-    min-height: 60vh;
+    min-height: 75vh;
     display: flex;
     align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) 0;
   }
 
-  .not-found p {
-    color: var(--text-color);
+  .plc-fault-card {
+    position: relative;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(10, 15, 30, 0.95));
+    border: 1px solid rgba(20, 184, 166, 0.2);
+    border-radius: 12px;
+    padding: var(--space-xl) var(--space-lg);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(20, 184, 166, 0.1);
+    overflow: hidden;
+  }
+
+  /* Decorative power rails on the card edges */
+  .ladder-rail {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--color-teal, #14b8a6), transparent);
+    opacity: 0.4;
+  }
+  .ladder-rail.top { top: 0; }
+  .ladder-rail.bottom { bottom: 0; }
+
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px solid rgba(20, 184, 166, 0.3);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-family: monospace;
+    color: var(--color-teal, #14b8a6);
+    margin-bottom: var(--space-md);
+  }
+
+  .led-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #ef4444; /* Red fault light */
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ef4444;
+    animation: pulse-red 2s infinite;
+  }
+
+  @keyframes pulse-red {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .glitch-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: var(--space-sm);
+  }
+
+  .description {
+    color: var(--text-color, #94a3b8);
+    font-size: 1.05rem;
+    line-type: 1.6;
+    max-width: 550px;
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Simulated ladder diagram styling */
+  .ladder-graphic {
+    width: 100%;
+    background: rgba(2, 6, 23, 0.7);
+    border: 1px dashed rgba(20, 184, 166, 0.3);
+    border-radius: 6px;
+    padding: var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: monospace;
+    color: var(--color-teal, #14b8a6);
+    margin-bottom: var(--space-lg);
+  }
+
+  .rail {
+    width: 12px;
+    height: 24px;
+    border-left: 2px solid var(--color-teal, #14b8a6);
+    border-right: 2px solid var(--color-teal, #14b8a6);
+    opacity: 0.6;
+  }
+
+  .rung-content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    font-size: 0.95rem;
+  }
+
+  .contact.open {
+    color: #f59e0b; /* Amber warning contact */
+    font-weight: bold;
+  }
+
+  .fault-text {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  .output.dead {
+    color: #64748b;
   }
 
   .actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-sm);
-    margin-top: var(--space-md);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 </style>
