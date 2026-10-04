@@ -40,7 +40,10 @@ const projects = defineCollection({
     category: z.string(),
     // Short 1-2 sentence blurb shown on the PROJECT CARD (listing + homepage)
     summary: z.string(),
-    // Path to the cover image, relative to /public — e.g. "/images/projects/foo.svg"
+    // Path to the cover image, relative to /public. Every project keeps ALL its
+    // images in its own folder, grouped by category, with the cover called
+    // "cover" — e.g. "/images/projects/Web-Development/My-Project/cover.png".
+    // (`npm run new:project` creates the folder and the cover for you.)
     cover: z.string(),
     // Tech-stack chips shown on the card, e.g. ["Arduino", "C++"]
     stack: z.array(z.string()).default([]),
@@ -63,6 +66,8 @@ const blog = defineCollection({
     category: z.string(),
     // Short summary shown on the BLOG CARD (listing + homepage)
     summary: z.string(),
+    // Same rule as projects: "/images/blog/<Category>/<Post-Folder>/cover.png".
+    // Use JPG or PNG for covers, because LinkedIn skips WebP and SVG previews.
     cover: z.string(),
     tags: z.array(z.string()).default([]),
     date: z.coerce.date(),

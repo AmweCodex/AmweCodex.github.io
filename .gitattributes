@@ -1,0 +1,12 @@
+# Keep the same line endings (LF) on every computer, so Git does not show
+# whole files as "changed" just because of Windows vs Mac/Linux endings.
+* text=auto eol=lf
+
+# Pictures, fonts and PDFs are binary: never touch their bytes.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary

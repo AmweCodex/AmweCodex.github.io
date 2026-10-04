@@ -1,8 +1,8 @@
 ---
-title: "Analog Tank - Pump Control"
+title: "Analog Tank Pump Control"
 category: "PLC"
 summary: "The analog version of my tank control: one scaled 0–100% level reading, compared against 20% and 80% trip points, driving the same seal-in FILL/DRAIN logic"
-cover: "/images/blog/analog-tank-pump-control.png"
+cover: "/images/blog/PLC/Analog-Tank-Pump-Control/cover.png"
 tags: ["Analog Tank", "Pump Control", "RSLogix 500", "Ladder Logic", "Process Logic", "SCP Instruction", "LES/GRT Comparison", "Seal-In Circuit", "Analog Input", "PLCDOJO"]
 date: 2026-09-23
 draft: false
@@ -12,7 +12,7 @@ This is the analog follow-up to my **Digital Tank - Pump Control** exercise. Sam
 
 The program was written in **RSLogix 500**, the software used throughout the **PLC Fundamentals (Level I)** course.
 
-![Tank with an analog level reading, checked against 20% and 80% trip points](/images/blog/Analog-Tank-Pump-Control/tank-modes.svg)
+![Tank with an analog level reading, checked against 20% and 80% trip points](/images/blog/PLC/Analog-Tank-Pump-Control/modes.svg)
 
 _One number, LEVEL, decides everything. Below 20% for 10 seconds, fill. Above 80% for 10 seconds, drain._
 
@@ -40,7 +40,7 @@ Everything between 20% and 80% is a dead band: the mode doesn't change, whicheve
 
 ## Inputs and outputs
 
-![I/O map: the analog level sensor scaled by an SCP block into LEVEL, and pump/valve outputs](/images/blog/Analog-Tank-Pump-Control/io-map.svg)
+![I/O map: the analog level sensor scaled by an SCP block into LEVEL, and pump/valve outputs](/images/blog/PLC/Analog-Tank-Pump-Control/io-map.svg)
 
 | Device        | Address  | Type            | Tag name |
 | ------------- | -------- | ---------------- | -------- |
@@ -63,7 +63,7 @@ Everything between 20% and 80% is a dead band: the mode doesn't change, whicheve
 
 Same three-file pattern as the digital version.
 
-![Program structure: MAIN calls IO first, then CONTROLS](/images/blog/Analog-Tank-Pump-Control/program-structure.svg)
+![Program structure: MAIN calls IO first, then CONTROLS](/images/blog/PLC/Analog-Tank-Pump-Control/program-structure.svg)
 
 | File    | Name       | Job                                                               |
 | ------- | ---------- | -------------------------------------------------------------------|
@@ -75,7 +75,7 @@ Same three-file pattern as the digital version.
 
 ### LAD 2 - MAIN
 
-![LAD 2 MAIN: two JSR instructions calling U:3 and U:4, then END](/images/blog/Analog-Tank-Pump-Control/ladder-main-lad2.png)
+![LAD 2 MAIN: two JSR instructions calling U:3 and U:4, then END](/images/blog/PLC/Analog-Tank-Pump-Control/ladder-main.png)
 
 _RSLogix 500 printout of the MAIN file._
 
@@ -92,13 +92,13 @@ The heart of this program is still the single bit `B3:0/6`, **FILL_MODE**, seale
 
 Instead of a physical switch closing, the set and break conditions are now **comparison instructions** reading `N7:0` (LEVEL) against fixed values.
 
-![Logic flow: LEVEL less than 20 percent through a 10-second timer sets FILL_MODE and seals it in; LEVEL greater than 80 percent through a 10-second timer breaks the seal](/images/blog/Analog-Tank-Pump-Control/logic-flow.svg)
+![Logic flow: LEVEL less than 20 percent through a 10-second timer sets FILL_MODE and seals it in; LEVEL greater than 80 percent through a 10-second timer breaks the seal](/images/blog/PLC/Analog-Tank-Pump-Control/logic-flow.svg)
 
 _Read it left to right: comparison, delay, set or break the seal, drive the outputs._
 
 ## LAD 3 - IO
 
-![LAD 3 IO: pump and valve output rungs, then an SCP block scaling the analog input into LEVEL](/images/blog/Analog-Tank-Pump-Control/ladder-io-lad3.png)
+![LAD 3 IO: pump and valve output rungs, then an SCP block scaling the analog input into LEVEL](/images/blog/PLC/Analog-Tank-Pump-Control/ladder-analog-io.png)
 
 _RSLogix 500 printout of the IO file._
 
@@ -111,7 +111,7 @@ The raw range (0–16383) is the module's full-scale analog count; `SCP` does th
 
 ## LAD 4 - CONTROLS
 
-![LAD 4 CONTROLS: LES and GRT comparisons feeding two TON timers, a seal-in rung for FILL_MODE, then the pump and valve output rungs](/images/blog/Analog-Tank-Pump-Control/ladder-controls-lad4.png)
+![LAD 4 CONTROLS: LES and GRT comparisons feeding two TON timers, a seal-in rung for FILL_MODE, then the pump and valve output rungs](/images/blog/PLC/Analog-Tank-Pump-Control/ladder-controls.png)
 
 _RSLogix 500 printout of the CONTROLS file._
 
@@ -151,7 +151,7 @@ Exactly the same self-sealing `OTE` pattern as the Digital Tank program — the 
 
 ## Expected behaviour
 
-![Timing diagram: LEVEL falling under 20% for 10 seconds sets FILL_MODE and starts the pump; LEVEL rising over 80% for 10 seconds breaks the seal and opens the valve](/images/blog/Analog-Tank-Pump-Control/timing-diagram.svg)
+![Timing diagram: LEVEL falling under 20% for 10 seconds sets FILL_MODE and starts the pump; LEVEL rising over 80% for 10 seconds breaks the seal and opens the valve](/images/blog/PLC/Analog-Tank-Pump-Control/timing-diagram.svg)
 
 _Follow LEVEL at the top, and FILL_MODE underneath it, to see exactly which threshold and which timer caused each change._
 

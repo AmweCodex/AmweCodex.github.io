@@ -1,20 +1,9 @@
 ---
-title: "PLC TIMERS"
+title: "PLC Timers"
 category: "PLC"
-summary: "Deep Dive into Delay Instructions"
-cover: "/images/blog/plc-timers.jpg"
-tags:
-  [
-    "PLC Timers",
-    "TON Timer",
-    "TOF Timer",
-    "TP Pulse Timer",
-    "RTO Retentive Timer",
-    "Ladder Logic",
-    "PLC Programming",
-    "Industrial Automation",
-    "Time Delay",
-  ]
+summary: "A deep dive into the four delay instructions (TON, TOF, TP and RTO) with timing diagrams and examples"
+cover: "/images/blog/PLC/PLC-Timers/cover.jpg"
+tags: ["PLC Timers", "TON Timer", "TOF Timer", "TP Pulse Timer", "RTO Retentive Timer", "Ladder Logic", "PLC Programming", "Industrial Automation", "Time Delay"]
 date: 2026-09-15
 draft: false
 ---
@@ -23,7 +12,7 @@ Most machines need to **wait**. A horn must sound before a conveyor starts. A fa
 
 There are four timers to know. Here they are side by side before we go into each one.
 
-![The four timer types at a glance: TON, TOF, TP and RTO](/images/blog/PLC-Timers/timer-types-overview.svg)
+![The four timer types at a glance: TON, TOF, TP and RTO](/images/blog/PLC/PLC-Timers/timer-types-overview.svg)
 
 _IN is the input to the timer. Q is the output. Each timer reacts to the input in its own way._
 
@@ -44,7 +33,7 @@ _IN is the input to the timer. Q is the output. Each timer reacts to the input i
 - **.TT (Timer Timing)** — true while the timer is actively counting (input true, hasn't reached preset yet)
 - **.DN (Done)** — true once accumulated time reaches the preset value
 
-![Timing diagram of a TON: the done bit turns on after the preset time, and a short input pulse resets the timer with no output](/images/blog/PLC-Timers/ton-timing.svg)
+![Timing diagram of a TON: the done bit turns on after the preset time, and a short input pulse resets the timer with no output](/images/blog/PLC/PLC-Timers/ton-timing.svg)
 
 _Look at the second, shorter pulse. The input dropped before PT was reached, so the timer reset and DN never turned on._
 
@@ -58,7 +47,7 @@ so here is what will happen here:
 - Until light switch 1 is false, the bulbs will stay on.
 
 **Everything is done on its own time and after the delay, how cool is that, automatically!**
-![PLC Timers Example](/images/blog/Other/timers_example1.png)
+![PLC Timers Example](/images/blog/PLC/PLC-Timers/timers-example.png)
 
 ## TOF - Timers [Timer Off Delay]
 
@@ -77,7 +66,7 @@ so here is what will happen here:
 - **.TT (Timer Timing)** — true while the timer is counting down toward turning the output off (i.e., input is false but PT hasn't been reached yet)
 - **.DN (Done)** — in most platforms this stays true for as long as the output should be on — true while the input is true, AND true during the off-delay countdown; only drops once PT elapses
 
-![Timing diagram of a TOF: the output stays on after the input drops, and only turns off once PT has passed](/images/blog/PLC-Timers/tof-timing.svg)
+![Timing diagram of a TOF: the output stays on after the input drops, and only turns off once PT has passed](/images/blog/PLC/PLC-Timers/tof-timing.svg)
 
 _The input came back during the first gap, so the timer reset and the output never dropped. After the second drop, PT ran out and the output turned off._
 
@@ -91,7 +80,7 @@ so here is what will happen here:
 - The Done bit is now false, so light bulb 2 turns off (this depends on the instruction you used, I used the `XIC`).
 
 **Everything is done on its own time and after the delay, how cool is that, automatically!**
-![PLC Timers Example](/images/blog/Other/TOF_example1.png)
+![PLC Timers Example](/images/blog/PLC/PLC-Timers/tof-example.png)
 
 ## TP - Timers [Pulse Timer]
 
@@ -105,7 +94,7 @@ so here is what will happen here:
 - **Elapsed Time (`ET`)** -> Counts up while the pulse is running.
 - **Ignores extra presses** -> If the input goes off and on again during the pulse, nothing changes. The pulse always runs its full length.
 
-![Timing diagram of a TP: the pulse always lasts PT, and a second press during the pulse is ignored](/images/blog/PLC-Timers/tp-timing.svg)
+![Timing diagram of a TP: the pulse always lasts PT, and a second press during the pulse is ignored](/images/blog/PLC/PLC-Timers/tp-timing.svg)
 
 _Whether the button is held for 10 seconds or tapped for a blink, the output pulse is the same length._
 
@@ -123,7 +112,7 @@ _Whether the button is held for 10 seconds or tapped for a blink, the output pul
 - **Output (`DN`)** -> Turns `TRUE` when the total accumulated time reaches `PRE`, and stays on.
 - **Reset (`RES`)** -> The only way to clear the accumulated time and the Done bit is a separate `RES` instruction using the same timer.
 
-![Timing diagram of an RTO: time adds up over three input pulses, the output turns on at PT, and a reset clears everything](/images/blog/PLC-Timers/rto-timing.svg)
+![Timing diagram of an RTO: time adds up over three input pulses, the output turns on at PT, and a reset clears everything](/images/blog/PLC/PLC-Timers/rto-timing.svg)
 
 _The three pulses add up to PT. Nothing clears until the RES rung goes true._
 
@@ -149,7 +138,7 @@ The idea is the same everywhere, but the parts have different names.
 
 ## Which timer should I use?
 
-![Real-world uses: conveyor start delay with TON, fan run-on with TOF, door strike pulse with TP, pump run hours with RTO](/images/blog/PLC-Timers/timer-use-cases.svg)
+![Real-world uses: conveyor start delay with TON, fan run-on with TOF, door strike pulse with TP, pump run hours with RTO](/images/blog/PLC/PLC-Timers/timer-use-cases.svg)
 
 | I want to...                                       | Use     |
 | -------------------------------------------------- | ------- |

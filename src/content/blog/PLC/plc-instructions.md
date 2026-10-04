@@ -1,23 +1,9 @@
 ---
 title: "PLC Instructions"
 category: "PLC"
-summary: "Understanding how plc instructions work"
-cover: "/images/blog/plc-instructions.jpg"
-tags:
-  [
-    "PLC Instructions",
-    "PLC Programming",
-    "Ladder Logic",
-    "IEC 61131-3",
-    "Timers",
-    "Counters",
-    "Seal-in Circuit",
-    "One-Shot",
-    "Comparison Instructions",
-    "Math Instructions",
-    "Industrial Automation",
-    "PLC Basics",
-  ]
+summary: "A practical guide to the main PLC instruction families: bit logic, timers, counters, comparison, maths and move instructions"
+cover: "/images/blog/PLC/PLC-Instructions/cover.jpg"
+tags: ["PLC Instructions", "PLC Programming", "Ladder Logic", "IEC 61131-3", "Timers", "Counters", "Seal-in Circuit", "One-Shot", "Comparison Instructions", "Math Instructions", "Industrial Automation", "PLC Basics"]
 date: 2026-09-15
 draft: false
 ---
@@ -26,7 +12,7 @@ Ladder logic is built from a small set of core instructions. Once you understand
 
 Think of them as a toolbox. Some tools **read** the state of something, some tools **change** it, and some tools **count, compare or calculate**. This post walks through each drawer.
 
-![The main families of ladder instructions: bit, one-shot, timers, counters, compare, math and move](/images/blog/PLC-Instructions/instruction-families.svg)
+![The main families of ladder instructions: bit, one-shot, timers, counters, compare, math and move](/images/blog/PLC/PLC-Instructions/instruction-families.svg)
 
 _Seven families cover almost everything you will meet in day-to-day ladder logic._
 
@@ -36,7 +22,7 @@ _Seven families cover almost everything you will meet in day-to-day ladder logic
 
 These five instructions read and write single bits. They are the foundation of everything else.
 
-![XIC, XIO, OTE, OTL and OTU shown as ladder symbols](/images/blog/PLC-Instructions/ladder-symbols.svg)
+![XIC, XIO, OTE, OTL and OTU shown as ladder symbols](/images/blog/PLC/PLC-Instructions/ladder-symbols.svg)
 
 _Inputs (teal) look at a bit. Outputs (amber) change a bit._
 
@@ -94,7 +80,7 @@ _Inputs (teal) look at a bit. Outputs (amber) change a bit._
 
 The easiest way to understand the difference is to watch both over time.
 
-![Timing diagram: the OTE bit drops when the rung goes false, the OTL bit stays on until an OTU rung clears it](/images/blog/PLC-Instructions/ote-vs-otl-timing.svg)
+![Timing diagram: the OTE bit drops when the rung goes false, the OTL bit stays on until an OTU rung clears it](/images/blog/PLC/PLC-Instructions/ote-vs-otl-timing.svg)
 
 _Same Start rung, two very different results. OTE forgets. OTL remembers._
 
@@ -102,7 +88,7 @@ _Same Start rung, two very different results. OTE forgets. OTL remembers._
 
 The most famous rung in ladder logic uses **XIC**, **XIO** and **OTE** together. It lets a momentary Start button keep a motor running, and a Stop button turn it off.
 
-![A start/stop seal-in rung with a Motor_Run contact in parallel with Start_PB](/images/blog/PLC-Instructions/seal-in-rung.svg)
+![A start/stop seal-in rung with a Motor_Run contact in parallel with Start_PB](/images/blog/PLC/PLC-Instructions/seal-in-rung.svg)
 
 _The Motor_Run contact in the bottom branch "seals in" the rung, so it keeps itself ON after you let go of Start._
 
@@ -124,7 +110,7 @@ A normal rung is `TRUE` for **every scan** while its condition is true. Sometime
 - **OSF (Output One-Shot Falling)** — turns its output bit ON for one scan on the **falling edge** (on to off).
 - Each one needs a **storage bit** to remember what the input was on the previous scan.
 
-![Timing diagram: an input held on for many scans produces only a single-scan pulse from a one-shot](/images/blog/PLC-Instructions/one-shot-timing.svg)
+![Timing diagram: an input held on for many scans produces only a single-scan pulse from a one-shot](/images/blog/PLC/PLC-Instructions/one-shot-timing.svg)
 
 _Even if a button is held down for ten seconds, the one-shot only fires for a single scan._
 
@@ -150,7 +136,7 @@ Counters keep track of **how many times** something happens, like boxes passing 
 - **Done bit (`DN`)**: When the accumulator reaches or exceeds the preset, the counter's "Done" (`DN`) status bit turns on.
 - **Reset (`RES`)**: A dedicated instruction used to clear the accumulated value (and the done bit) back to zero.
 
-![Timing diagram of a count-up counter with a preset of 5: the accumulator counts up, the done bit turns on at 5, and a reset clears everything](/images/blog/PLC-Instructions/counter-ctu-timing.svg)
+![Timing diagram of a count-up counter with a preset of 5: the accumulator counts up, the done bit turns on at 5, and a reset clears everything](/images/blog/PLC/PLC-Instructions/counter-ctu-timing.svg)
 
 _The counter keeps counting after it reaches the preset. Only a reset brings it back to zero._
 
@@ -174,7 +160,7 @@ Comparison instructions look at **numbers** instead of bits. They act like a con
 
 Example: a tank level alarm. If `Tank_Level` is greater than `80`, the alarm lamp turns on.
 
-![A GRT instruction comparing Tank_Level with 80 and driving an alarm lamp](/images/blog/PLC-Instructions/compare-math-move-rungs.svg)
+![A GRT instruction comparing Tank_Level with 80 and driving an alarm lamp](/images/blog/PLC/PLC-Instructions/compare-math-move-rungs.svg)
 
 _Compare, math and move instructions sit in a rung just like a contact or a coil._
 

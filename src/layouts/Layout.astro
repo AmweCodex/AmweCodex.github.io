@@ -2,7 +2,7 @@
 /*
   Layout.astro
   ------------------------------------------------------------------------
-  This is the "page frame". Every page (right now just index.astro) wraps
+  This is the "page frame". Every page wraps
   its content in this layout, like:
 
       <Layout title="..." description="...">
@@ -21,11 +21,14 @@ interface Props {
   title: string;
   description?: string;
   // Picture shown when the page is shared on LinkedIn, WhatsApp, X, etc.
-  // Path from /public, e.g. "/images/blog/plc-timers.jpg". Blog and project
-  // pages pass their cover image; every other page uses your profile photo.
+  // Path from /public, e.g. "/images/blog/PLC/PLC-Timers/cover.jpg". Blog and
+  // project pages pass their cover image; every other page uses your profile
+  // photo. Keep covers as JPG or PNG: LinkedIn skips WebP and SVG previews.
   image?: string;
   // "article" for blog posts and project write-ups, "website" for the rest.
   type?: 'website' | 'article';
+  // true = ask search engines not to list this page (used by the 404 page).
+  noindex?: boolean;
 }
 
 const {
@@ -33,6 +36,7 @@ const {
   description = 'Portfolio of Musawandile Shamase — Electronics & Computer Engineering graduate specialising in embedded systems and industrial automation (PLCs).',
   image = '/profile.jpg',
   type = 'website',
+  noindex = false,
 } = Astro.props;
 
 // Social sites need FULL links (with https://...), not just "/profile.jpg".
@@ -49,11 +53,25 @@ const twitterCard = image === '/profile.jpg' ? 'summary' : 'summary_large_image'
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="/profile.jpg" />
+
+    <!--
+      Favicon set, made from the <Amwe/Codex> logo brackets:
+        - favicon.svg: sharp at every size, used by modern browsers
+        - favicon.ico: fallback for older browsers
+        - apple-touch-icon.png: the icon iPhones use for "Add to Home Screen"
+    -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Lets search engines and feed readers find the sitemap and the blog feed -->
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="AmweCodex Blog" href="/rss.xml" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex" />}
 
     <!--
       Google Search Console ownership check. This used to sit inside

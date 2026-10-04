@@ -1,20 +1,9 @@
 ---
 title: "IO (Inputs and Outputs)"
 category: "PLC"
-summary: "Basic Understanding of how Analog and Digital IO Works"
-cover: "/images/blog/digital_vs_analog_io.jpg"
-tags:
-  [
-    "PLC IO",
-    "Digital IO",
-    "Analog Signals",
-    "4-20mA",
-    "Signal Scaling",
-    "Sensors",
-    "Industrial Automation",
-    "Discrete Signals",
-    "PLC Wiring",
-  ]
+summary: "How digital and analog inputs and outputs work, from 4-20 mA signals and scaling to sourcing and sinking wiring"
+cover: "/images/blog/PLC/PLC-IO/cover.jpg"
+tags: ["PLC IO", "Digital IO", "Analog Signals", "4-20mA", "Signal Scaling", "Sensors", "Industrial Automation", "Discrete Signals", "PLC Wiring"]
 date: 2026-09-15
 draft: false
 ---
@@ -27,7 +16,7 @@ In this post I break IO into its two families, **digital** and **analog**, and s
 
 Every signal travels the same road: a field device connects to an **IO card**, the card hands the information to the **CPU**, and the CPU sends its decision back out through another card.
 
-![How a PLC connects field devices through IO cards, plus the three-step scan cycle](/images/blog/PLC-IO/plc-io-scan-cycle.svg)
+![How a PLC connects field devices through IO cards, plus the three-step scan cycle](/images/blog/PLC/PLC-IO/plc-io-scan-cycle.svg)
 
 _The PLC repeats the scan cycle (read inputs, run program, write outputs) many times every second._
 
@@ -35,7 +24,7 @@ _The PLC repeats the scan cycle (read inputs, run program, write outputs) many t
 
 ## Digital vs analog: the difference at a glance
 
-![Digital signals jump between two states, analog signals move smoothly across a range](/images/blog/PLC-IO/digital-vs-analog-signals.svg)
+![Digital signals jump between two states, analog signals move smoothly across a range](/images/blog/PLC/PLC-IO/digital-vs-analog-signals.svg)
 
 _Digital is a light switch. Analog is a dimmer._
 
@@ -71,7 +60,7 @@ _Digital is a light switch. Analog is a dimmer._
 - **Sinking (NPN)**: the device/PLC card provides the path to `0V`/ground; current flows into the card from the field device.
 - Most European/Siemens gear defaults to sourcing (PNP), while a lot of older American/Asian equipment uses sinking (NPN). Always check your card's wiring diagram before hooking up a new sensor.
 
-![Wiring for a PNP sensor with a sinking input and an NPN sensor with a sourcing input](/images/blog/PLC-IO/sourcing-vs-sinking-wiring.svg)
+![Wiring for a PNP sensor with a sinking input and an NPN sensor with a sourcing input](/images/blog/PLC/PLC-IO/sourcing-vs-sinking-wiring.svg)
 
 _Follow the arrows. Current always travels from +24V to 0V, the only difference is which device it passes through first._
 
@@ -79,7 +68,7 @@ _Follow the arrows. Current always travels from +24V to 0V, the only difference 
 
 Example
 
-![PLC IO Example](/images/blog/Other/Sourcing_vs_Sinking.png)
+![PLC IO Example](/images/blog/PLC/PLC-IO/sourcing-vs-sinking.png)
 
 ## Analog IO
 
@@ -110,7 +99,7 @@ Example
 - A live zero (**4mA = 0%**) lets the system tell the difference between "signal is genuinely at zero" and "wire is broken/disconnected" (which would read `0mA`).
 - This built-in fault detection is a big reason 4-20mA dominates industrial analog wiring over voltage signals, which are more prone to noise over long cable runs anyway.
 
-![A 4-20mA signal mapped to 0-10 bar, with the fault zone below 4mA](/images/blog/PLC-IO/four-to-twenty-ma.svg)
+![A 4-20mA signal mapped to 0-10 bar, with the fault zone below 4mA](/images/blog/PLC/PLC-IO/four-to-twenty-ma.svg)
 
 _The signal never sits at 0mA in normal use. If you see 0mA, something is wrong with the loop._
 
@@ -145,7 +134,7 @@ rPressure := (rMilliamps - 4.0) / (20.0 - 4.0) * (10.0 - 0.0) + 0.0;
 
 An ADC chops the signal into a fixed number of steps. More bits means more steps, so smaller changes can be seen.
 
-![A 3-bit ADC compared to a 12-bit ADC measuring the same rising signal](/images/blog/PLC-IO/adc-resolution.svg)
+![A 3-bit ADC compared to a 12-bit ADC measuring the same rising signal](/images/blog/PLC/PLC-IO/adc-resolution.svg)
 
 | Resolution | Number of steps |
 | ---------- | --------------- |
@@ -157,7 +146,7 @@ An ADC chops the signal into a fixed number of steps. More bits means more steps
 
 Here is how all four IO types can show up in one small machine.
 
-![IO for a tank filling station: start and stop buttons, level transmitter, pump contactor, run lamp and inlet valve positioner](/images/blog/PLC-IO/tank-filling-station-io.svg)
+![IO for a tank filling station: start and stop buttons, level transmitter, pump contactor, run lamp and inlet valve positioner](/images/blog/PLC/PLC-IO/tank-filling-station-io.svg)
 
 - The operator presses **Start** (DI). The PLC turns on the **pump contactor** (DO) and the **green lamp** (DO).
 - The **level transmitter** (AI) keeps telling the PLC how full the tank is.

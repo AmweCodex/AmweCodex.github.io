@@ -12,6 +12,13 @@ export default defineConfig({
 
   integrations: [sitemap()],
 
+  // Old addresses that have moved. The PLC_LAB folder was renamed to
+  // PLC-LAB, so the Motor Start-Stop post changed address. Anyone with the
+  // old link is sent to the new one.
+  redirects: {
+    '/blog/plc_lab/motor-start-stop-with-seal-in': '/blog/plc-lab/motor-start-stop-with-seal-in',
+  },
+
   markdown: {
     shikiConfig: {
       // Two colour themes for code blocks: one for dark mode, one for light.

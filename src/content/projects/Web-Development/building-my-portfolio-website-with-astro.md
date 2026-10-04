@@ -2,25 +2,19 @@
 title: "Building my portfolio website with Astro and Claude AI"
 category: "Web Development"
 summary: "How I built a dark navy and teal portfolio and blog from scratch, where every project and post is just a Markdown file."
-cover: "/images/projects/building-my-portfolio-website-with-astro.png"
-stack: ["web-development", "portfolio", "markdown", "astro"]
+cover: "/images/projects/Web-Development/Building-my-portfolio-website-with-Astro-and-Claude-AI/cover.jpg"
+stack: ["Astro", "Markdown", "CSS", "GitHub Pages"]
 date: 2026-09-20
 draft: false
 ---
 
 I studied electronic engineering, and I spend most of my time around circuits, microcontrollers and, more recently, PLCs. What I did not have was one proper place to show that work. My projects were scattered across folders, GitHub repos and half finished notes.
 
-Yes i know some basic **HTML**,**CSS** and **Java Script** but i am no expect and i had to build this project, So I built one with AI, yes with Claude AI. This post is the story of how I made my portfolio and blog website from scratch without knowing much, what I chose, and what went wrong along the way.
+Yes, I know some basic **HTML**, **CSS** and **JavaScript**, but I am no expert, and I still had to build this project. So I built one with AI, yes, with Claude AI. This post is the story of how I made my portfolio and blog website from scratch without knowing much, what I chose, and what went wrong along the way.
 
 > **The short version:** built with Astro and Claude, powered by Markdown, styled in dark navy and teal, and designed so that adding a new project or post takes a few minutes.
 
-<!--
-📸 SCREENSHOT 1: the homepage hero section.
-Save it as images/homepage-hero.png, then remove the comment markers around the line below.
-
-![The AmweCodex homepage with the dark navy hero section](./images/projects/Others/homepage-hero.png)
--->
-![The AmweCodex homepage with the dark navy hero section](/images/projects/Others/homepage-hero.png)
+![The AmweCodex homepage with the dark navy hero section](/images/projects/Web-Development/Building-my-portfolio-website-with-Astro-and-Claude-AI/homepage-hero.png)
 
 ## What I wanted the site to do
 
@@ -50,7 +44,7 @@ I wanted something fast, simple and friendly to Markdown. Astro fits that well. 
 
 I wanted the site to feel calm and technical, like a control-room screen at night. That meant a dark navy background, soft blue-grey text, and one bright teal accent for anything clickable or important.
 
-![The seven colours used across the site](/images/projects/Others/colour-palette.svg)
+![The seven colours used across the site](/images/projects/Web-Development/Building-my-portfolio-website-with-Astro-and-Claude-AI/colour-palette.svg)
 
 A few design choices I am happy with:
 
@@ -62,7 +56,7 @@ A few design choices I am happy with:
 
 The header has five tabs: Home, About, Projects, Blog and Contact. Projects and Blog each open their own listing page, and clicking any item opens a full detail page, not just a small card.
 
-![A map of the site and the pages each tab leads to](/images/projects/Others/site-map.svg)
+![A map of the site and the pages each tab leads to](/images/projects/Web-Development/Building-my-portfolio-website-with-Astro-and-Claude-AI/site-map.svg)
 
 The homepage shows my three latest projects and three latest posts, so visitors always see what is new. My skills live on the About page, in the same card style.
 
@@ -86,17 +80,19 @@ src/
 
 This is the part I enjoy most. To publish something new, I create a Markdown file, fill in a few lines at the top (the frontmatter), and write. Astro does the rest.
 
-![How a Markdown file becomes a page on the website](/images/projects/Others/markdown-to-page.svg)
+![How a Markdown file becomes a page on the website](/images/projects/Web-Development/Building-my-portfolio-website-with-Astro-and-Claude-AI/markdown-to-page.svg)
 
 A post starts like this:
 
 ```yaml
 ---
 title: "My first PLC program in CODESYS"
-description: "Turning an LED on with ladder logic."
-pubDate: 2026-10-01
 category: "PLC"
-tags: ["plc", "codesys", "ladder-logic"]
+summary: "Turning an LED on with ladder logic"
+cover: "/images/blog/PLC/My-First-PLC-Program-in-CODESYS/cover.png"
+tags: ["PLC", "CODESYS", "Ladder Logic"]
+date: 2026-10-01
+draft: false
 ---
 ```
 
@@ -126,12 +122,6 @@ On a phone, the page stays at 760px or less. On a laptop, it grows to 75% of the
 
 **Image warnings.** Astro's analyser told me my profile picture should use the Image component. Switching to it gave me properly optimised images.
 
-<!--
-📸 SCREENSHOT 2: a project detail page.
-Save it as images/project-detail.png, then remove the comment markers around the line below.
-
-![A project detail page on the AmweCodex site](./images/projects/Others/project-detail.png)
--->
 
 ## What I learnt
 

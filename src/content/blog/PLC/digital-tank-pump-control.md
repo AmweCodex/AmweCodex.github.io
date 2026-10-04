@@ -2,20 +2,8 @@
 title: "Digital Tank Pump Control"
 category: "PLC"
 summary: "A level-based fill/drain tank control written in RSLogix 500 for the Process Logic chapter, using two on-delay timers and a seal-in circuit to switch between FILL and DRAIN mode"
-cover: "/images/blog/digital-tank-pump-control.png"
-tags:
-  [
-    "Digital Tank",
-    "Pump Control",
-    "RSLogix 500",
-    "Ladder Logic",
-    "Process Logic",
-    "TON Instruction",
-    "Seal-In Circuit",
-    "Level Control",
-    "PLC Project",
-    "PLCDOJO",
-  ]
+cover: "/images/blog/PLC/Digital-Tank-Pump-Control/cover.png"
+tags: ["Digital Tank", "Pump Control", "RSLogix 500", "Ladder Logic", "Process Logic", "TON Instruction", "Seal-In Circuit", "Level Control", "PLC Project", "PLCDOJO"]
 date: 2026-09-22
 draft: false
 ---
@@ -24,7 +12,7 @@ Still on the **Process Logic** chapter of my PLC certification with PLCDOJO.com,
 
 The program was written in **RSLogix 500**, the software used throughout the **PLC Fundamentals (Level I)** course.
 
-![Tank with L, LL, H and HH level switches, and the pump/valve that respond to them](/images/blog/Digital-Tank-Pump-Control/tank-modes.svg)
+![Tank with L, LL, H and HH level switches, and the pump/valve that respond to them](/images/blog/PLC/Digital-Tank-Pump-Control/modes.svg)
 
 _Four switches watch the water level. Two timers decide when the pump and valve should respond._
 
@@ -55,7 +43,7 @@ Rather than switching the pump on and off the instant a switch changes, the prog
 
 ## Inputs and outputs
 
-![I/O map: four level switches on the input module and a pump plus valve on the output module](/images/blog/Digital-Tank-Pump-Control/io-map.svg)
+![I/O map: four level switches on the input module and a pump plus valve on the output module](/images/blog/PLC/Digital-Tank-Pump-Control/io-map.svg)
 
 | Device      | Address | Type           | Tag name         |
 | ----------- | ------- | -------------- | ----------------- |
@@ -84,7 +72,7 @@ Rather than switching the pump on and off the instant a switch changes, the prog
 
 Same three-file pattern as my earlier HOA project: keep the physical wiring in one file, keep the decision-making in another.
 
-![Program structure: MAIN calls DIGITAL IO first, then CONTROLS](/images/blog/Digital-Tank-Pump-Control/program-structure.svg)
+![Program structure: MAIN calls DIGITAL IO first, then CONTROLS](/images/blog/PLC/Digital-Tank-Pump-Control/program-structure.svg)
 
 | File    | Name       | Job                                                             |
 | ------- | ---------- | ----------------------------------------------------------------- |
@@ -96,7 +84,7 @@ Same three-file pattern as my earlier HOA project: keep the physical wiring in o
 
 ### LAD 2 - MAIN
 
-![LAD 2 MAIN: two JSR instructions calling U:3 and U:4, then END](/images/blog/Digital-Tank-Pump-Control/digital-tank-main-routine.png)
+![LAD 2 MAIN: two JSR instructions calling U:3 and U:4, then END](/images/blog/PLC/Digital-Tank-Pump-Control/ladder-main.png)
 
 _RSLogix 500 printout of the MAIN file._
 
@@ -113,13 +101,13 @@ The heart of this program is a single bit, `B3:0/6`, named **FILL_MODE**.
 
 `FILL_MODE` is driven by an ordinary `OTE`, not `OTL`/`OTU` — but it still behaves like a latch, because the rung includes a **seal-in contact**: the coil's own bit, wired back in as one of the conditions that keeps it true. That's a very common PLC pattern for holding a bit on across scans without a dedicated latch instruction.
 
-![Logic flow: L switch sets FILL_MODE through a 10-second timer, FILL_MODE seals itself in, and H switch breaks the seal through its own 10-second timer](/images/blog/Digital-Tank-Pump-Control/logic-flow.svg)
+![Logic flow: L switch sets FILL_MODE through a 10-second timer, FILL_MODE seals itself in, and H switch breaks the seal through its own 10-second timer](/images/blog/PLC/Digital-Tank-Pump-Control/logic-flow.svg)
 
 _Read it left to right: switch, delay, set or break the seal, drive the outputs._
 
 ## LAD 3 - DIGITAL IO
 
-![LAD 3 DIGITAL IO: four switches copied into internal bits and two rungs driving the pump and valve](/images/blog/Digital-Tank-Pump-Control/digital-tank-digital-io.png)
+![LAD 3 DIGITAL IO: four switches copied into internal bits and two rungs driving the pump and valve](/images/blog/PLC/Digital-Tank-Pump-Control/ladder-digital-io.png)
 
 _RSLogix 500 printout of the DIGITAL IO file._
 
@@ -137,7 +125,7 @@ Rungs 0–3 copy each physical switch into an internal bit, and rungs 4–5 copy
 
 ## LAD 4 - CONTROLS
 
-![LAD 4 CONTROLS: two TON timer rungs, a seal-in rung for FILL_MODE, then the pump and valve output rungs](/images/blog/Digital-Tank-Pump-Control/digital-tank-controls.png)
+![LAD 4 CONTROLS: two TON timer rungs, a seal-in rung for FILL_MODE, then the pump and valve output rungs](/images/blog/PLC/Digital-Tank-Pump-Control/ladder-controls.png)
 
 _RSLogix 500 printout of the CONTROLS file._
 
@@ -179,7 +167,7 @@ The two outputs are mutually exclusive: the pump pushes water in during FILL, an
 
 ## Expected behaviour
 
-![Timing diagram: L switch active for 10 seconds seals FILL_MODE on and starts the pump; H switch active for 10 seconds breaks the seal, stops the pump and opens the valve](/images/blog/Digital-Tank-Pump-Control/timing-diagram.svg)
+![Timing diagram: L switch active for 10 seconds seals FILL_MODE on and starts the pump; H switch active for 10 seconds breaks the seal, stops the pump and opens the valve](/images/blog/PLC/Digital-Tank-Pump-Control/timing-diagram.svg)
 
 _Follow FILL_MODE (third row) and see which timer, and how long, made it change._
 

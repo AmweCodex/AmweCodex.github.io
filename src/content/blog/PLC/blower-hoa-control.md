@@ -1,22 +1,9 @@
 ---
 title: "Blower HOA (Hand / Off / Auto) Control"
 category: "PLC"
-summary: "A three-mode blower control written in RSLogix 500 for the Process Logic chapter"
-cover: "/images/blog/blower-hoa-control.png"
-tags:
-  [
-    "HOA Control",
-    "Blower Control",
-    "RSLogix 500",
-    "Ladder Logic",
-    "Process Logic",
-    "One-Shot (ONS)",
-    "MOV Instruction",
-    "EQU Instruction",
-    "Subroutines",
-    "PLC Project",
-    "PLCDOJO",
-  ]
+summary: "A three-mode (Hand / Off / Auto) blower control written in RSLogix 500 for the Process Logic chapter"
+cover: "/images/blog/PLC/Blower-HOA/cover.png"
+tags: ["HOA Control", "Blower Control", "RSLogix 500", "Ladder Logic", "Process Logic", "One-Shot (ONS)", "MOV Instruction", "EQU Instruction", "Subroutines", "PLC Project", "PLCDOJO"]
 date: 2026-09-21
 draft: false
 ---
@@ -25,7 +12,7 @@ I am now on the **Process Logic** chapter of my PLC certification with PLCDOJO.c
 
 The program was written in **RSLogix 500**, because that is the software we use in the **PLC Fundamentals (Level I)** course.
 
-![The three HOA modes: OFF keeps the blower off, HAND runs it now, AUTO runs it only when the auto energize bit is on](/images/blog/Blower-HOA/hoa-modes.svg)
+![The three HOA modes: OFF keeps the blower off, HAND runs it now, AUTO runs it only when the auto energize bit is on](/images/blog/PLC/Blower-HOA/modes.svg)
 
 _Three modes, one blower. The mode you pick decides when the blower is allowed to run._
 
@@ -54,7 +41,7 @@ On a real panel this is often a three-position selector switch. In this exercise
 
 ## Inputs and outputs
 
-![I/O map: three push buttons on the input module and one blower output on the output module](/images/blog/Blower-HOA/io-map.svg)
+![I/O map: three push buttons on the input module and one blower output on the output module](/images/blog/PLC/Blower-HOA/io-map.svg)
 
 | Device        | Address | Type           | Tag name       |
 | ------------- | ------- | -------------- | -------------- |
@@ -81,7 +68,7 @@ On a real panel this is often a three-position selector switch. In this exercise
 
 I split the program into three ladder files instead of putting everything in one long list of rungs.
 
-![Program structure: MAIN jumps to DIGITAL IO first and then to CONTROLS](/images/blog/Blower-HOA/program-structure.svg)
+![Program structure: MAIN jumps to DIGITAL IO first and then to CONTROLS](/images/blog/PLC/Blower-HOA/program-structure.svg)
 
 | File    | Name       | Job                                                           |
 | ------- | ---------- | ------------------------------------------------------------- |
@@ -93,7 +80,7 @@ I split the program into three ladder files instead of putting everything in one
 
 ### LAD 2 - MAIN
 
-![LAD 2 MAIN: two JSR instructions calling U:3 and U:4, then END](/images/blog/Blower-HOA/ladder-main-lad2.png)
+![LAD 2 MAIN: two JSR instructions calling U:3 and U:4, then END](/images/blog/PLC/Blower-HOA/ladder-main.png)
 
 _RSLogix 500 printout of the MAIN file._
 
@@ -113,13 +100,13 @@ The heart of this program is one integer, `N7:0`, named **BLOWER_STATE**.
 
 Each button simply **writes its own number** into `N7:0`. Because one number can only hold one value, the blower can only ever be in **one mode at a time**. There is no way for HAND and AUTO to be active together, so I did not need any extra interlock logic.
 
-![Logic flow: each button goes through a one-shot and writes 0, 1 or 2 into N7:0, then two comparisons decide if the blower coil turns on](/images/blog/Blower-HOA/hoa-logic-flow.svg)
+![Logic flow: each button goes through a one-shot and writes 0, 1 or 2 into N7:0, then two comparisons decide if the blower coil turns on](/images/blog/PLC/Blower-HOA/logic-flow.svg)
 
 _Read it from left to right: button, once, write, remember, decide, run._
 
 ## LAD 3 - DIGITAL IO
 
-![LAD 3 DIGITAL IO: three buttons copied into internal bits and one rung driving the blower output](/images/blog/Blower-HOA/ladder-digital-io-lad3.png)
+![LAD 3 DIGITAL IO: three buttons copied into internal bits and one rung driving the blower output](/images/blog/PLC/Blower-HOA/ladder-digital-io.png)
 
 _RSLogix 500 printout of the DIGITAL IO file._
 
@@ -135,7 +122,7 @@ Rungs 0 to 2 copy each physical input into an internal bit. The control logic th
 
 ## LAD 4 - CONTROLS
 
-![LAD 4 CONTROLS: three one-shot MOV rungs, then two EQU comparisons driving the BLOWER bit](/images/blog/Blower-HOA/ladder-controls-lad4.png)
+![LAD 4 CONTROLS: three one-shot MOV rungs, then two EQU comparisons driving the BLOWER bit](/images/blog/PLC/Blower-HOA/ladder-controls.png)
 
 _RSLogix 500 printout of the CONTROLS file._
 
@@ -177,7 +164,7 @@ If the state is `0` (OFF), neither branch is true, so the blower stays off.
 
 ## Expected behaviour
 
-![Timing diagram: HAND turns the blower on, OFF turns it off, AUTO waits for the auto energize bit, then HAND runs it again](/images/blog/Blower-HOA/hoa-timing.svg)
+![Timing diagram: HAND turns the blower on, OFF turns it off, AUTO waits for the auto energize bit, then HAND runs it again](/images/blog/PLC/Blower-HOA/timing-diagram.svg)
 
 _Follow the blower output (bottom row) and see which mode and bit made it change._
 

@@ -1,19 +1,22 @@
 /*
   scripts/lib/generate-cover-svg.mjs
   ============================================================================
-  Generates a cover image in the SAME visual style as your existing ones
-  (compare public/images/projects/cable-fault-detection.svg) — dark navy
-  gradient background, a soft teal glow, a scatter of faint circuit-board
-  lines and "signal" dots, and a centred monospace label.
+  Generates a cover image in the same style as the site: dark navy gradient,
+  a soft teal glow, faint circuit-board lines, teal "signal" dots and a
+  centred monospace label.
 
-  This is shared code used by BOTH scripts/new-post.mjs and
-  scripts/new-project.mjs, so the two always look consistent and a fix
-  here fixes both at once.
+  Used by new-post.mjs and new-project.mjs, so a fix here fixes both.
+
+  saveCover() writes the cover as cover.png. LinkedIn and some other sites
+  skip SVG pictures in link previews, so a PNG is the safe choice. If the
+  `sharp` image tool is not installed, it falls back to cover.svg.
   ============================================================================
 */
 
-// Your exact palette, copied from src/styles/global.css, so a generated
-// cover never looks out of place next to a hand-made one.
+import { writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+// The site palette, copied from src/styles/global.css.
 const BG_START = '#141d2b';
 const BG_END = '#1a2331';
 const TEAL = '#07e9b4';
@@ -23,12 +26,12 @@ const TEXT_COLOR = '#cad2e2';
 const WIDTH = 800;
 const HEIGHT = 450;
 
-/** Random number between min and max (inclusive-ish), rounded to whole pixels. */
+/** Random whole number between min and max. */
 function rand(min, max) {
   return Math.round(min + Math.random() * (max - min));
 }
 
-/** A handful of short random line segments, echoing PCB trace routing. */
+/** A handful of short random line segments, like circuit-board traces. */
 function randomLines(count) {
   let lines = '';
   for (let i = 0; i < count; i++) {
@@ -44,7 +47,7 @@ function randomLines(count) {
   return lines;
 }
 
-/** A handful of small teal "signal" dots scattered over the lines. */
+/** A handful of small teal "signal" dots. */
 function randomDots(count) {
   let dots = '';
   for (let i = 0; i < count; i++) {
@@ -58,12 +61,10 @@ function randomDots(count) {
 }
 
 /**
- * Builds the full SVG markup as a string.
- * @param {string} label - Short, UPPERCASE text shown centred on the cover
- *   (e.g. "RUNG 004" for a blog post, "CABLE FAULT" for a project).
- * @param {string} idSuffix - A unique-ish string (we use the slug) mixed
- *   into the gradient ids, purely so two covers never accidentally share
- *   an id if they're ever inlined together.
+ * Builds the SVG markup as a string.
+ * @param {string} label     Short UPPERCASE text shown in the middle.
+ * @param {string} idSuffix  Any unique text (we use the slug), added to the
+ *                           gradient ids so two covers never share an id.
  */
 export function generateCoverSvg(label, idSuffix) {
   const safeSuffix = idSuffix.replace(/[^a-z0-9]/gi, '');
@@ -90,41 +91,47 @@ export function generateCoverSvg(label, idSuffix) {
 `;
 }
 
-/*
-  ---- Label helpers ---------------------------------------------------
-  These decide WHAT text goes on the cover, so it "syncs with the topic"
-  automatically instead of you having to think one up each time.
-------------------------------------------------------------------------- */
-
 /**
- * Blog covers use the site's "RUNG 00N" ladder-logic numbering — matching
- * your existing posts (RUNG 001, RUNG 002...). We work out the next
- * number by counting how many blog posts already exist.
- * @param {number} existingPostCount
+ * Saves the cover into `folderUrl` and returns the file name it used
+ * ("cover.png", or "cover.svg" if PNG conversion is not possible).
+ * @param {string} svg        The markup from generateCoverSvg().
+ * @param {URL} folderUrl     The post's own image folder (must end in "/").
  */
-export function nextRungLabel(existingPostCount) {
-  const number = String(existingPostCount + 1).padStart(3, '0');
-  return `RUNG ${number}`;
+export async function saveCover(svg, folderUrl) {
+  try {
+    const { default: sharp } = await import('sharp');
+    await sharp(Buffer.from(svg), { density: 192 })
+      .resize({ width: 1200 })
+      .png({ compressionLevel: 9 })
+      .toFile(fileURLToPath(new URL('cover.png', folderUrl)));
+    return 'cover.png';
+  } catch {
+    writeFileSync(new URL('cover.svg', folderUrl), svg, 'utf8');
+    return 'cover.svg';
+  }
 }
 
-// Generic words that don't carry much meaning on a small cover label —
-// stripped out so the label focuses on the distinctive part of the title.
+/*
+  ---- Label helpers --------------------------------------------------------
+  These decide what text goes on the cover.
+------------------------------------------------------------------------- */
+
+/** Blog covers use "RUNG 00N", matching the ladder-logic theme. */
+export function nextRungLabel(existingPostCount) {
+  return `RUNG ${String(existingPostCount + 1).padStart(3, '0')}`;
+}
+
+// Words that add little on a small label, so they are skipped.
 const FILLER_WORDS = new Set([
-  'a', 'an', 'the', 'for', 'with', 'and', 'system', 'project', 'my',
-  'of', 'in', 'on', 'to',
+  'a', 'an', 'the', 'for', 'with', 'and', 'system', 'project', 'my', 'of', 'in', 'on', 'to',
 ]);
 
 /**
- * Project covers get a short UPPERCASE label pulled from the title, e.g.
- * "Cable Fault Detection System" -> "CABLE FAULT". Filler words are
- * dropped, and it's capped at two words so it fits the canvas cleanly.
- * @param {string} title
+ * Project covers get a short label from the title, e.g.
+ * "Cable Fault Detection System" -> "CABLE FAULT" (two words at most).
  */
 export function labelFromTitle(title) {
-  const words = title
-    .split(/\s+/)
-    .filter((word) => word && !FILLER_WORDS.has(word.toLowerCase()));
-
+  const words = title.split(/\s+/).filter((word) => word && !FILLER_WORDS.has(word.toLowerCase()));
   const chosen = (words.length > 0 ? words : title.split(/\s+/)).slice(0, 2);
   return chosen.join(' ').toUpperCase();
 }

@@ -1,0 +1,53 @@
+---
+/*
+  src/pages/404.astro  →  shown for any address that does not exist
+  ------------------------------------------------------------------------
+  GitHub Pages automatically serves the built 404.html whenever someone
+  opens a broken link, so visitors land here instead of on GitHub's plain
+  default page. Links use full paths (/blog, not blog) because this page
+  can be shown at any depth, e.g. /blog/old/address.
+------------------------------------------------------------------------- */
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Page not found — Musawandile Shamase"
+  description="This page does not exist or has moved."
+  noindex
+>
+  <section class="section not-found">
+    <div class="container narrow">
+      <p class="eyebrow"><span class="led-dot"></span>Error 404</p>
+      <h1>Rung not found</h1>
+      <p>
+        This page does not exist, or it has moved. There is no power flow on
+        this rung, so let's get you back to a live one.
+      </p>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="/">Back to home</a>
+        <a class="btn btn-ghost" href="/blog">Read the blog</a>
+        <a class="btn btn-ghost" href="/projects">See projects</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .not-found {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .not-found p {
+    color: var(--text-color);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+</style>

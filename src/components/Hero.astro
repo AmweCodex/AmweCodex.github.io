@@ -17,10 +17,10 @@ import SocialLinks from './SocialLinks.astro';
 // photo instead of shipping the original JPEG as-is — this is what the
 // Astro analyser was flagging. It needs the image to be `import`ed from
 // inside src/ (here: src/assets/profile.jpg) rather than referenced as a
-// plain string path into /public, which is why the image now lives in
-// src/assets/ as well as public/ (the public copy is kept only for the
-// <link rel="icon"> favicon in Layout.astro, which can't use this
-// component).
+// plain string path into /public, which is why the photo lives in
+// src/assets/ as well as public/. The public copy is kept only as the
+// default social-share picture in Layout.astro, because that needs a
+// plain, never-changing URL (/profile.jpg).
 import { Image } from 'astro:assets';
 import profilePhoto from '../assets/profile.jpg';
 ---

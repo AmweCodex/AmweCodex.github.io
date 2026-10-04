@@ -5,9 +5,9 @@
   Same pattern as src/pages/projects/[...id].astro — see the comments
   there for how getStaticPaths() + render() work, and why "..." matters.
   This version reads from the "blog" collection instead of "projects".
-  Blog posts are all flat right now, but using [...id] here too means
-  you can start organising posts into folders later (e.g. blog/PLC/,
-  blog/Career/) without anything breaking.
+  Posts live in category folders (e.g. blog/PLC/, blog/PLC-LAB/), so the
+  address of a post includes the folder: /blog/plc/plc-timers. That is why
+  [...id] (with the dots) is needed here.
 ------------------------------------------------------------------------- */
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';

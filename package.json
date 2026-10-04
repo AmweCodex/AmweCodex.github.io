@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "amwecodex-github-io",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -15,8 +15,9 @@
     "new:certificate": "node scripts/new-certificate.mjs"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
-    "astro": "^7.2.10"
+    "astro": "^7.3.5"
   },
   "allowScripts": {
     "esbuild": true
