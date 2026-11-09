@@ -2,7 +2,7 @@
 title: "Motor Start/Stop with Seal-In"
 category: "PLC-LAB"
 summary: "The motor's own output is placed in parallel with the START button, so once the motor is ON it supplies its own power path. The STOP contact is placed in series with everything, so it can cut the power at any moment."
-cover: "/images/blog/PLC-LAB/Motor-StartStop-with-Seal-In/cover.png"
+cover: "/images/blog/PLC-LAB/Motor_StartStop_with_Seal_In/cover.png"
 tags: ["Practice", "Logic", "Seal-In", "RSLogix 500", "Learning"]
 date: 2026-10-2
 draft: false
@@ -46,13 +46,13 @@ With the problem clear, the next question was what the PLC actually needs to see
 |-----|---------|--------|
 | CONVEYOR_MOTOR | O:2/0 | Conveyor motor |
 
-![Input and output flow](/images/blog/PLC-LAB/Motor-StartStop-with-Seal-In/io-map.svg)
+![Input and output flow](/images/blog/PLC-LAB/Motor_StartStop_with_Seal_In/io-map.svg)
 
 One thing I learned about PLC programming is that you make a program usable by giving it an architecture. A rule I now follow is to never program the inputs directly. Instead, the first part of the program copies the physical inputs into internal bits, the control logic then works only with those internal bits, and a final rung drives the physical output from the MOTOR bit.
 
 That is why I have a DIGITAL_IO file. If a wire moves to a different terminal one day, I change one rung in one file and leave the control logic untouched. The figure below shows how the program takes the inputs from the PLC.
 
-![DIGITAL_IO ladder: physical inputs copied into internal bits, and the MOTOR bit copied to the output](/images/blog/PLC-LAB/Motor-StartStop-with-Seal-In/DIGITAL_IO.png)
+![DIGITAL_IO ladder: physical inputs copied into internal bits, and the MOTOR bit copied to the output](/images/blog/PLC-LAB/Motor_StartStop_with_Seal_In/DIGITAL_IO.png)
 
 Reading the figure from top to bottom:
 
@@ -86,7 +86,7 @@ Before drawing any ladder, I asked myself a simple question: how many conditions
 
 The same behaviour drawn as a state diagram makes it even clearer. There are only two states, and only two things move the motor between them.
 
-![State diagram: stopped and running](/images/blog/PLC-LAB/Motor-StartStop-with-Seal-In/state-diagram.svg)
+![State diagram: stopped and running](/images/blog/PLC-LAB/Motor_StartStop_with_Seal_In/state-diagram.svg)
 
 I like writing this table before the ladder, because it turns the problem into a checklist. If the ladder reproduces every row, the program is right. If it does not, I know exactly which row to look at.
 
@@ -94,11 +94,11 @@ I like writing this table before the ladder, because it turns the problem into a
 
 Now the ladder. My program is organised as three files. MAIN calls the DIGITAL_IO file first, which maps the inputs, and then the CONTROLS file, which holds the actual logic.
 
-![Program organisation: MAIN, DIGITAL_IO, CONTROLS](/images/blog/PLC-LAB/Motor-StartStop-with-Seal-In/program-flow.svg)
+![Program organisation: MAIN, DIGITAL_IO, CONTROLS](/images/blog/PLC-LAB/Motor_StartStop_with_Seal_In/program-flow.svg)
 
 The figure below is the CONTROLS file. It is one rung, and it is the entire control logic of the system.
 
-![CONTROLS ladder: START and MOTOR in parallel, STOP in series, driving the MOTOR coil](/images/blog/PLC-LAB/Motor-StartStop-with-Seal-In/CONTROLS.png)
+![CONTROLS ladder: START and MOTOR in parallel, STOP in series, driving the MOTOR coil](/images/blog/PLC-LAB/Motor_StartStop_with_Seal_In/CONTROLS.png)
 
 **Rung 0: Motor seal-in.** Reading left to right:
 
@@ -127,11 +127,11 @@ I tested the program in the RSLogix 500 emulator by toggling the input bits and 
 
 The animation below shows the expected behaviour as the sequence runs. The buttons change, the conveyor and motor respond, and the rung at the bottom shows each contact turning true or false in real time.
 
-![Expected behaviour of the conveyor motor through the full test sequence](/images/blog/PLC-LAB/Motor-StartStop-with-Seal-In/test-sequence-animation.svg)
+![Expected behaviour of the conveyor motor through the full test sequence](/images/blog/PLC-LAB/Motor_StartStop_with_Seal_In/test-sequence-animation.svg)
 
 The same sequence as a timing diagram. Notice the STOP_PB trace: it is the opposite of the STOP button, because of the XIO in DIGITAL_IO.
 
-![Timing diagram of START, STOP, STOP_PB and MOTOR](/images/blog/PLC-LAB/Motor-StartStop-with-Seal-In/timing-diagram.svg)
+![Timing diagram of START, STOP, STOP_PB and MOTOR](/images/blog/PLC-LAB/Motor_StartStop_with_Seal_In/timing-diagram.svg)
 
 One behaviour worth knowing about: if START is still held down when STOP is released, the rung becomes true again and the motor restarts. That is not a bug. It is exactly what the logic says, and it is the reason real machines often add protection against unexpected restarts.
 
