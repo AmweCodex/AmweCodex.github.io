@@ -1,6 +1,6 @@
 ---
 title: "Delayed Conveyor Start"
-category: "PLC-LAB"
+category: "[ PLC-LAB ] Level 1 - Fundamentals"
 summary: "A momentary START press is turned into a sealed-in request that feeds a 5-second TON timer. The motor starts only when the timer is done, and a READY lamp stays on for exactly as long as the request is accepted but the delay is still running."
 cover: "/images/blog/PLC-LAB/Delayed-Conveyor-Start/cover.png"
 tags: ["Practice", "Timers", "TON", "RSLogix 500", "Learning"]

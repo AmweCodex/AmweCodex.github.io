@@ -1,6 +1,6 @@
 ---
 title: "Motor StartStop with SealIn"
-category: "PLC-LAB"
+category: "[ PLC-LAB ] Level 1 - Fundamentals"
 summary: "The motor's own output is placed in parallel with the START button, so once the motor is ON it supplies its own power path. The STOP contact is placed in series with everything, so it can cut the power at any moment."
 cover: "/images/blog/PLC-LAB/Motor-StartStop-with-SealIn/cover.png"
 tags: ["Practice", "Logic", "Seal-In", "RSLogix 500", "Learning"]

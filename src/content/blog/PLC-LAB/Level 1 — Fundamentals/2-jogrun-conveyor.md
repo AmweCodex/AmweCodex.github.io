@@ -1,6 +1,6 @@
 ---
 title: "Jog/Run Conveyor"
-category: "PLC-LAB"
+category: "[ PLC-LAB ] Level 1 - Fundamentals"
 summary: "RUN is remembered in its own memory bit so the motor keeps going after the button is released, JOG runs the motor only while it is held, and STOP is placed in series with everything so it can cut the power at any moment."
 cover: "/images/blog/PLC-LAB/JogRun-Conveyor/cover.png"
 tags: ["Practice", "Logic", "Jog", "Seal-In", "RSLogix 500", "Learning"]

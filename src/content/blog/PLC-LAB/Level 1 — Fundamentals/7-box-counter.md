@@ -1,6 +1,6 @@
 ---
 title: "Box Counter"
-category: "PLC-LAB"
+category: "[ PLC-LAB ] Level 1 - Fundamentals"
 summary: "A photoelectric sensor counts boxes with a CTU counter. The conveyor runs after START, stops by itself when the batch is complete, and only a RESET allows the next batch."
 cover: "/images/blog/PLC-LAB/Box-Counter/cover.png"
 tags: ["Practice", "Counters", "CTU", "RSLogix 500", "Learning"]

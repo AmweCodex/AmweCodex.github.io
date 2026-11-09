@@ -1,6 +1,6 @@
 ---
 title: "Automatic Motor Stop Timer"
-category: "PLC-LAB"
+category: "[ PLC-LAB ] Level 1 - Fundamentals"
 summary: "A conveyor that runs for exactly 10 seconds after START, stops on its own, and can be stopped early. My first practice problem built around the TON timer, a one-shot and a seal-in."
 cover: "/images/blog/PLC-LAB/Automatic-Motor-Stop-Timer/cover.png"
 tags: ["PLC", "RSLogix 500", "MicroLogix 1100", "TON Timer", "One-Shot", "Seal-In", "Ladder Logic"]

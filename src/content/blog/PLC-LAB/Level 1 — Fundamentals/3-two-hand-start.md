@@ -1,6 +1,6 @@
 ---
 title: "Two-Hand Start"
-category: "PLC-LAB"
+category: "[ PLC-LAB ] Level 1 - Fundamentals"
 summary: "Both start buttons are placed in series, so the press motor can only run while two hands are on the buttons. The STOP contact is placed in series as well, so it can remove the run command at any moment, and nothing is latched."
 cover: "/images/blog/PLC-LAB/Two-Hand-Start/cover.png"
 tags: ["Practice", "Safety", "Interlock", "RSLogix 500", "Learning"]

@@ -1,6 +1,6 @@
 ---
 title: "Motor with Run Indicator"
-category: "PLC-LAB"
+category: "[ PLC-LAB ] Level 1 - Fundamentals"
 summary: "The RUN lamp is driven from the motor's own command bit, so it can never disagree with the motor: when the seal-in turns the motor on, the lamp comes on with it, and when STOP drops the motor out, the lamp goes off."
 cover: "/images/blog/PLC-LAB/Motor-with-Run-Indicator/cover.png"
 tags: ["Practice", "Logic", "indicators", "RSLogix 500", "Learning"]
