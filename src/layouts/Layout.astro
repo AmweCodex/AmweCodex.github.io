@@ -15,6 +15,8 @@
 ------------------------------------------------------------------------- */
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ScrollProgress from '../components/ScrollProgress.astro';
+import BackToTop from '../components/BackToTop.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -33,7 +35,7 @@ interface Props {
 
 const {
   title,
-  description = 'Portfolio of Musawandile Shamase — Electronics & Computer Engineering graduate specialising in embedded systems and industrial automation (PLCs).',
+  description = 'Portfolio of Musawandile Shamase, an Electronics & Computer Engineering graduate specialising in embedded systems and industrial automation (PLCs).',
   image = '/profile.jpg',
   type = 'website',
   noindex = false,
@@ -174,6 +176,9 @@ const twitterCard = image === '/profile.jpg' ? 'summary' : 'summary_large_image'
     />
   </head>
   <body>
+    <!-- Reading progress bar (top of the screen) -->
+    <ScrollProgress />
+
     <!-- Header is fixed/sticky and appears above every page's content -->
     <Header />
 
@@ -187,6 +192,9 @@ const twitterCard = image === '/profile.jpg' ? 'summary' : 'summary_large_image'
     </main>
 
     <Footer />
+
+    <!-- Floating "back to top" button (bottom-right corner) -->
+    <BackToTop />
 
     <!-- Adds a "Copy" button to every code block in posts and projects -->
     <script>

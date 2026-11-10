@@ -1,0 +1,127 @@
+---
+/*
+  BackToTop.astro
+  ------------------------------------------------------------------------
+  A round button fixed to the bottom-right corner. It appears once you have
+  scrolled a little, shows a ring that fills as you read, and jumps back to
+  the top of the page when pressed. Handy at the end of a long post.
+------------------------------------------------------------------------- */
+---
+
+<button class="back-to-top" type="button" aria-label="Back to top" hidden>
+  <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+    <circle class="ring-track" cx="22" cy="22" r="19" />
+    <circle class="ring-fill" cx="22" cy="22" r="19" />
+  </svg>
+  <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 19V5M5 12l7-7 7 7" />
+  </svg>
+</button>
+
+<style>
+  .back-to-top {
+    position: fixed;
+    right: max(1.25rem, env(safe-area-inset-right));
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    z-index: 60;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--teal);
+    cursor: pointer;
+    box-shadow: 0 8px 24px -8px var(--shadow-color);
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease,
+      border-color 0.15s ease;
+  }
+  .back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .back-to-top:hover {
+    border-color: var(--teal);
+  }
+  .back-to-top:hover .arrow {
+    transform: translateY(-2px);
+  }
+
+  .ring {
+    position: absolute;
+    inset: 2px;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    transform: rotate(-90deg);
+  }
+  .ring circle {
+    fill: none;
+    stroke-width: 2.5;
+  }
+  .ring-track {
+    stroke: var(--divider-color);
+  }
+  .ring-fill {
+    stroke: var(--teal);
+    stroke-linecap: round;
+    stroke-dasharray: 119.4; /* circumference of r=19 */
+    stroke-dashoffset: 119.4;
+  }
+
+  .arrow {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.15s ease;
+  }
+</style>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.back-to-top');
+  const fill = document.querySelector<SVGCircleElement>('.back-to-top .ring-fill');
+
+  if (button && fill) {
+    const CIRCUMFERENCE = 119.4;
+    const SHOW_AFTER = 400; // pixels scrolled before the button appears
+    let queued = false;
+
+    const update = () => {
+      queued = false;
+      const root = document.documentElement;
+      const scrollable = root.scrollHeight - root.clientHeight;
+      const visible = root.scrollTop > SHOW_AFTER;
+      if (visible) button.hidden = false;
+      button.classList.toggle('visible', visible);
+      const ratio = scrollable > 0 ? Math.min(1, root.scrollTop / scrollable) : 0;
+      fill.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - ratio));
+    };
+
+    const request = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    button.addEventListener('click', () => {
+      // global.css already turns smooth scrolling off for "reduce motion"
+      scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    addEventListener('scroll', request, { passive: true });
+    addEventListener('resize', request);
+    update();
+  }
+</script>

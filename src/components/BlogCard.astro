@@ -7,28 +7,28 @@
   the full post body only renders on /blog/<id>.
 ------------------------------------------------------------------------- */
 import type { CollectionEntry } from 'astro:content';
+import { formatDate, readingMinutes } from '../lib/blog';
 
 interface Props {
   entry: CollectionEntry<'blog'>;
+  // true on the homepage, where posts from different categories are mixed
+  showCategory?: boolean;
 }
 
-const { entry } = Astro.props;
+const { entry, showCategory = false } = Astro.props;
 const { title, summary, cover, tags, date } = entry.data;
 
-// Format the date as e.g. "12 Jan 2026" — readable, locale-neutral
-const formattedDate = date.toLocaleDateString('en-GB', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-});
+const formattedDate = formatDate(date);
+const minutes = readingMinutes(entry.body);
 ---
 
 <a class="blog-card card" href={`/blog/${entry.id}`}>
   <div class="card-image">
-    <img src={cover} alt="" loading="lazy" />
+    <img src={cover} alt="" width="1200" height="675" loading="lazy" decoding="async" />
   </div>
   <div class="card-body">
-    <p class="card-date">{formattedDate}</p>
+    <p class="card-date">{formattedDate} · {minutes} min read</p>
+    {showCategory && <p class="card-category">{entry.data.category}</p>}
     <h3>{title}</h3>
     <p class="card-summary">{summary}</p>
     {tags.length > 0 && (
@@ -72,6 +72,14 @@ const formattedDate = date.toLocaleDateString('en-GB', {
     font-size: 0.72rem;
     color: var(--teal);
     margin-bottom: 0.3rem;
+  }
+
+  .card-category {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-color);
+    margin-bottom: 0.3rem;
+    text-align: left;
   }
 
   .card-body h3 {

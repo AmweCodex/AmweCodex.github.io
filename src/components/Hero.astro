@@ -2,51 +2,57 @@
 /*
   Hero.astro
   ------------------------------------------------------------------------
-  The first thing a visitor sees. Two columns on desktop (text left,
-  photo right), stacking to one column on mobile via CSS Grid + a
-  media query (see <style> below).
+  The first thing a visitor sees. Left: who I am, what I do and the main
+  buttons. Right: my photo in a framed "panel" with two live status chips
+  (the certificate I hold and the level I am working on now), like the
+  indicator lights on a PLC rack. Under both sits a row of four numbers
+  that count themselves from the content folders, so they never go stale.
 
-  The signature visual moment here is the animated ring of "circuit
-  traces" around your photo — a dashed circle whose dash pattern
-  animates, so it reads like a signal travelling around a PCB trace.
-  It's drawn with plain SVG + CSS, no JS/animation library required.
+  The photo is imported from src/assets so Astro can resize and compress
+  it at build time (the original stays in /public only for social previews).
 ------------------------------------------------------------------------- */
-import SocialLinks from './SocialLinks.astro';
-// Astro's built-in image component: at build time it generates an
-// optimised, correctly-sized, modern-format (e.g. WebP) version of this
-// photo instead of shipping the original JPEG as-is — this is what the
-// Astro analyser was flagging. It needs the image to be `import`ed from
-// inside src/ (here: src/assets/profile.jpg) rather than referenced as a
-// plain string path into /public, which is why the photo lives in
-// src/assets/ as well as public/. The public copy is kept only as the
-// default social-share picture in Layout.astro, because that needs a
-// plain, never-changing URL (/profile.jpg).
 import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
 import profilePhoto from '../assets/profile.jpg';
+import SocialLinks from './SocialLinks.astro';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const projects = await getCollection('projects', ({ data }) => !data.draft);
+const certificates = await getCollection('certificates', ({ data }) => !data.draft);
+
+const labPosts = posts.filter((post) => post.data.category.includes('PLC-LAB')).length;
+
+const stats = [
+  { value: String(certificates.length), label: certificates.length === 1 ? 'PLC certificate' : 'PLC certificates' },
+  { value: String(labPosts), label: 'PLC-LAB write-ups' },
+  { value: String(posts.length), label: 'Blog posts' },
+  { value: String(projects.length), label: projects.length === 1 ? 'Project' : 'Projects' },
+];
 ---
 
 <section id="top" class="hero">
-  <!-- Faint dot-grid background, purely decorative (aria-hidden) -->
   <div class="hero-grid" aria-hidden="true"></div>
 
   <div class="container hero-inner">
     <div class="hero-text">
-      <p class="eyebrow"><span class="led-dot"></span>Available for graduate & junior roles</p>
+      <p class="eyebrow"><span class="led-dot"></span>Available immediately · Graduate &amp; junior roles</p>
 
       <h1>
-        Musawandile Shamase
+        Musawandile<br />
+        <span class="surname">Shamase</span>
       </h1>
-      <p class="hero-title">
-        Electronics &amp; Computer Engineering Graduate <span class="divider-dot">·</span> Control Systems &amp; Industrial Automation <b>[PLC] </b>
+
+      <p class="hero-role">
+        Electronics &amp; Computer Engineer <span class="sep">/</span> Control Systems &amp; Industrial Automation <b>[PLC]</b>
       </p>
 
       <p class="hero-summary">
-        BEngTech graduate from the Durban University of Technology, with a strong
-        technical foundation in electronic circuit design, control systems,
-        embedded systems, and software development, and currently deepening my
-        industrial-automation skillset through a PLC Programming Certification
-        from <a href="https://www.plcdojo.com/" class="hero-title" target="_blank">PLC Dojo</a>. I like taking a problem from schematic to working
-        prototype.
+        BEngTech graduate from the Durban University of Technology with a
+        foundation in electronic circuit design, control systems, embedded
+        systems and software. I'm now building my industrial-automation
+        skills with <a href="https://www.plcdojo.com/" target="_blank" rel="noopener noreferrer">PLC Dojo</a>{' '}
+        and documenting every practice problem here, from the first rung to a
+        tested program.
       </p>
 
       <div class="hero-actions">
@@ -57,7 +63,8 @@ import profilePhoto from '../assets/profile.jpg';
         >
           Download Resume
         </a>
-        <a class="btn btn-ghost" href="#projects">View Projects</a>
+        <a class="btn btn-ghost" href="/blog">Read the Blog</a>
+        <a class="btn btn-ghost" href="/projects">View Projects</a>
       </div>
 
       <div class="hero-socials">
@@ -65,20 +72,41 @@ import profilePhoto from '../assets/profile.jpg';
       </div>
     </div>
 
-    <div class="hero-photo-wrap">
-      <!-- Animated dashed ring drawn behind the photo -->
-      <svg class="photo-ring" viewBox="0 0 300 300" aria-hidden="true">
-        <circle cx="150" cy="150" r="140" class="ring-track" />
-        <circle cx="150" cy="150" r="140" class="ring-trace" />
-      </svg>
-      <Image
-        src={profilePhoto}
-        alt="Portrait of Musawandile Shamase"
-        class="hero-photo"
-        width={480}
-        height={480}
-      />
+    <div class="hero-panel">
+      <div class="photo-frame">
+        <Image
+          src={profilePhoto}
+          alt="Portrait of Musawandile Shamase"
+          class="hero-photo"
+          width={480}
+          height={480}
+          loading="eager"
+        />
+        <!-- corner brackets, like the registration marks on a PCB -->
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+      </div>
+
+      <div class="chip chip-done">
+        <span class="chip-icon" aria-hidden="true">✓</span>
+        <span><b>PLC Fundamentals</b> (Level I)</span>
+      </div>
+      <div class="chip chip-live">
+        <span class="status-blink" aria-hidden="true"></span>
+        <span><b>Applied Logic</b> (Level 2) in progress</span>
+      </div>
     </div>
+  </div>
+
+  <div class="container">
+    <dl class="stats">
+      {stats.map((stat) => (
+        <div class="stat">
+          <dt>{stat.label}</dt>
+          <dd>{stat.value}</dd>
+        </div>
+      ))}
+    </dl>
   </div>
 </section>
 
@@ -89,45 +117,61 @@ import profilePhoto from '../assets/profile.jpg';
     overflow: hidden;
   }
 
-  /* Subtle repeating dot pattern using a CSS radial-gradient background,
-     instead of an image — keeps the page lightweight. */
+  /* Faint grid, fading out towards the edges. Pure CSS, no image. */
   .hero-grid {
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
-    background-size: 34px 34px;
-    opacity: 0.18;
-    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    background-image:
+      linear-gradient(var(--border-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.12;
+    mask-image: radial-gradient(ellipse at 70% 40%, black 15%, transparent 70%);
     pointer-events: none;
   }
 
   .hero-inner {
     position: relative;
     display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: var(--space-lg);
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: var(--space-xl);
     align-items: center;
   }
 
-  .hero-title {
-    font-family: var(--font-mono);
-    font-size: 0.95rem;
-    color: var(--teal);
+  .hero h1 {
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
     margin-bottom: var(--space-sm);
   }
-  .divider-dot {
-    color: var(--border-color);
+  .surname {
+    color: var(--teal);
   }
 
-  .hero h1 {
-    font-size: clamp(2.4rem, 5vw, 3.4rem);
-    margin-bottom: var(--space-xs);
+  .hero-role {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--heading-color);
+    margin-bottom: var(--space-sm);
+    text-align: left;
+  }
+  .hero-role .sep {
+    color: var(--border-color);
+    margin: 0 0.25rem;
+  }
+  .hero-role b {
+    color: var(--teal);
+    font-weight: 500;
   }
 
   .hero-summary {
-    max-width: 46ch;
-    color: var(--text-color);
+    max-width: 52ch;
     margin-bottom: var(--space-md);
+  }
+  .hero-summary a {
+    color: var(--teal);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .hero-actions {
@@ -137,86 +181,149 @@ import profilePhoto from '../assets/profile.jpg';
     margin-bottom: var(--space-md);
   }
 
-  /* ---- Photo + animated ring ------------------------------------- */
-  .hero-photo-wrap {
+  /* ---- Photo panel ------------------------------------------------ */
+  .hero-panel {
     position: relative;
     justify-self: center;
-    width: min(340px, 80vw);
-    aspect-ratio: 1 / 1;
+    width: min(340px, 78vw);
   }
 
-  .hero-photo {
-    position: absolute;
-    inset: 14%;
-    width: 72%;
-    height: 72%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--border-color);
+  .photo-frame {
+    position: relative;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 22px;
+    background: var(--bg-secondary);
+    box-shadow: 0 24px 60px -30px var(--shadow-color);
   }
-
-  .photo-ring {
-    position: absolute;
-    inset: 0;
+  .photo-frame :global(.hero-photo) {
     width: 100%;
-    height: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 50%; /* the portrait is a circle, so crop it as one */
   }
 
-  /* The static, dim full circle "track" the trace runs along */
-  .ring-track {
-    fill: none;
-    stroke: var(--divider-color);
-    stroke-width: 1.5;
+  .corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--teal);
+    opacity: 0.9;
+  }
+  .tl { top: -6px; left: -6px; border-right: 0; border-bottom: 0; border-top-left-radius: 8px; }
+  .tr { top: -6px; right: -6px; border-left: 0; border-bottom: 0; border-top-right-radius: 8px; }
+  .bl { bottom: -6px; left: -6px; border-right: 0; border-top: 0; border-bottom-left-radius: 8px; }
+  .br { bottom: -6px; right: -6px; border-left: 0; border-top: 0; border-bottom-right-radius: 8px; }
+
+  /* Status chips overlapping the frame */
+  .chip {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    font-size: 0.78rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    box-shadow: 0 10px 28px -12px var(--shadow-color);
+  }
+  .chip b {
+    color: var(--heading-color);
+    font-weight: 600;
+  }
+  .chip-done {
+    left: -1.25rem;
+    bottom: 4.25rem;
+    border-color: var(--teal-border);
+  }
+  .chip-icon {
+    color: var(--teal);
+    font-weight: 700;
+  }
+  .chip-live {
+    right: -1.25rem;
+    bottom: -1rem;
+  }
+  .status-blink {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 8px var(--teal-glow);
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
   }
 
-  /* The bright teal dash that travels around the ring, like a signal
-     pulse moving along a circuit trace. stroke-dasharray creates short
-     dashes with big gaps; animating stroke-dashoffset moves them. */
-  .ring-trace {
-    fill: none;
-    stroke: var(--teal);
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-dasharray: 18 70;
-    filter: drop-shadow(0 0 5px var(--teal));
-    animation: travel 6s linear infinite;
+  /* ---- Numbers row ------------------------------------------------ */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: var(--space-xl) 0 0;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: var(--bg-secondary);
+    overflow: hidden;
   }
-
-  @keyframes travel {
-    to {
-      stroke-dashoffset: -880; /* roughly the ring's circumference */
-    }
+  .stat {
+    display: flex;
+    flex-direction: column-reverse; /* number above its label */
+    padding: var(--space-sm) var(--space-md);
+  }
+  .stat + .stat {
+    border-left: 1px solid var(--divider-color);
+  }
+  .stat dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    font-weight: 600;
+    color: var(--heading-color);
+    line-height: 1.1;
+  }
+  .stat dt {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-color);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ring-trace {
+    .status-blink {
       animation: none;
     }
   }
 
-  /* ---- Responsive: stack to one column on smaller screens --------- */
+  /* ---- Smaller screens -------------------------------------------- */
   @media (max-width: 900px) {
     .hero-inner {
       grid-template-columns: 1fr;
-      text-align: center;
+      gap: var(--space-lg);
     }
-    .hero-summary {
-      margin-left: auto;
-      margin-right: auto;
-      /* Override the global justify on small screens: the stacked mobile
-         layout centers everything else here, so keep this centered too
-         instead of justified. */
-      text-align: center;
-    }
-    .hero-actions,
-    .hero-socials {
-      justify-content: center;
-    }
-    .hero-socials {
-      display: flex;
-    }
-    .hero-photo-wrap {
+    .hero-panel {
       order: -1;
+      margin-bottom: var(--space-sm);
     }
+    .stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .stat:nth-child(3) {
+      border-left: 0;
+    }
+    .stat:nth-child(n + 3) {
+      border-top: 1px solid var(--divider-color);
+    }
+  }
+  @media (max-width: 520px) {
+    .chip-done { left: 0; }
+    .chip-live { right: 0; }
+    .hero-summary { text-align: left; }
   }
 </style>

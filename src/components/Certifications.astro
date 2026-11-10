@@ -2,23 +2,30 @@
 /*
   Certifications.astro
   ------------------------------------------------------------------------
-  Education + the two certifications currently in progress. The
-  "In Progress" ones get a small animated status pill instead of a plain
-  label, so it's visually obvious at a glance which credentials are
-  already complete vs. still being worked on.
+  Education + certifications. Finished certificates are read from
+  src/content/certificates/ (so adding one with `npm run new:certificate`
+  updates this section by itself). Courses still being studied are listed
+  in `inProgress` below; when one is finished, delete it from that list and
+  add its certificate.
 ------------------------------------------------------------------------- */
+import { getCollection } from 'astro:content';
+
 const education = {
   degree: 'Bachelor of Engineering Technology (BEngTech), Electronics & Computer Engineering',
   school: 'Durban University of Technology (DUT), Durban, South Africa',
   status: 'Graduated 2025',
 };
 
-const certifications = [
+const completed = (await getCollection('certificates', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const inProgress = [
   {
-    name: 'PLC Programming Certification',
-    focus: 'PLC Programming, PLC Architecture, Scan Cycles, Digital/Analog I/O, Ladder Logic, Timers & Counters, Industrial Automation',
-    inProgress: true,
-  }
+    name: 'Applied Logic (Level 2)',
+    provider: 'PLC Dojo',
+    focus: 'The next level of the PLC Programming Certification, building on the Level I fundamentals.',
+  },
 ];
 ---
 
@@ -34,16 +41,31 @@ const certifications = [
     </div>
 
     <div class="cert-grid">
-      {certifications.map((cert) => (
+      {completed.map(({ data }) => (
+        <div class="cert-card card">
+          <div class="cert-heading">
+            <h3>{data.title}</h3>
+            <span class="status-pill status-done">Completed</span>
+          </div>
+          <p class="cert-meta">{data.provider} · {data.date.toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' })}</p>
+          <p class="cert-meta">{data.summary}</p>
+          {(data.link || data.pdf) && (
+            <a class="cert-link" href={data.link ?? data.pdf} target="_blank" rel="noopener noreferrer">
+              {data.link ? 'Verify certificate' : 'View certificate'} &rarr;
+            </a>
+          )}
+        </div>
+      ))}
+
+      {inProgress.map((cert) => (
         <div class="cert-card card">
           <div class="cert-heading">
             <h3>{cert.name}</h3>
-            {cert.inProgress && (
-              <span class="status-pill status-progress">
-                <span class="status-blink"></span> In Progress
-              </span>
-            )}
+            <span class="status-pill status-progress">
+              <span class="status-blink"></span> In Progress
+            </span>
           </div>
+          <p class="cert-meta">{cert.provider}</p>
           <p class="cert-meta">{cert.focus}</p>
         </div>
       ))}
@@ -84,7 +106,20 @@ const certifications = [
   .cert-meta {
     color: var(--text-color);
     font-size: 0.88rem;
-    margin: 0;
+    margin: 0 0 0.4rem;
+    text-align: left;
+  }
+
+  .cert-link {
+    display: inline-block;
+    margin-top: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--teal);
+  }
+  .cert-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .status-pill {
@@ -102,6 +137,8 @@ const certifications = [
   .status-done {
     color: var(--teal);
     border: 1px solid var(--teal-border);
+  }
+  .education-card .status-done {
     margin-top: var(--space-xs);
   }
 

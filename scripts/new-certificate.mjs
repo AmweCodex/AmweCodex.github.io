@@ -7,7 +7,7 @@
   page by itself.
 
   Before you run it, put your files in place. Use the title as a "slug"
-  (lowercase with hyphens) for both file names, e.g. plc-fundamentals-level-2:
+  (lowercase with underscores) for both file names, e.g. plc_fundamentals_level_2:
 
     public/certificates/<slug>.pdf          the PDF copy (optional)
     public/images/certificates/<slug>.jpg   a picture of the certificate

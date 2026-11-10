@@ -5,41 +5,44 @@
   these same functions, so a post's markdown file, image folder and
   frontmatter paths can never drift apart.
 
-    Title     "Analog Tank - Pump Control"
-    File      analog-tank-pump-control.md          (slugify)
-    Folder    Analog-Tank-Pump-Control             (folderName)
+  One rule everywhere: words are joined with an underscore (_), never a
+  hyphen or a space.
 
-    Category  "PLC LAB"
-    Folder    PLC-LAB                              (categoryFolder)
+    Title     "Analog Tank - Pump Control"
+    File      analog_tank_pump_control.md          (slugify)
+    Folder    Analog_Tank_Pump_Control             (folderName)
+
+    Category  "Web Development"
+    Folder    Web_Development                      (categoryFolder)
   ============================================================================
 */
 
-/** "My Great Title!" -> "my-great-title". Used for markdown file names. */
+/** "My Great Title!" -> "my_great_title". Used for markdown file names. */
 export function slugify(text) {
   return text
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, '') // drop punctuation
-    .replace(/\s+/g, '-') // spaces -> hyphens
-    .replace(/-+/g, '-') // collapse repeated hyphens
-    .replace(/^-|-$/g, ''); // no hyphen at either end
+    .replace(/[^a-z0-9\s_-]/g, '') // drop punctuation
+    .replace(/[\s-]+/g, '_') // spaces and hyphens -> underscores
+    .replace(/_+/g, '_') // collapse repeated underscores
+    .replace(/^_|_$/g, ''); // no underscore at either end
 }
 
 /**
- * "Analog Tank - Pump Control" -> "Analog-Tank-Pump-Control".
- * Same words as the title, separated by hyphens, capital letters kept.
+ * "Analog Tank - Pump Control" -> "Analog_Tank_Pump_Control".
+ * Same words as the title, separated by underscores, capital letters kept.
  * Used for the folder that holds every image of one post or project.
  */
 export function folderName(text) {
   return text
     .trim()
-    .replace(/[^A-Za-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/[^A-Za-z0-9\s_-]/g, '')
+    .replace(/[\s-]+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '');
 }
 
-/** "PLC LAB" -> "PLC-LAB", "Web Development" -> "Web-Development". */
+/** "Web Development" -> "Web_Development". */
 export function categoryFolder(label) {
   return folderName(label);
 }

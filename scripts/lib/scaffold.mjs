@@ -6,11 +6,15 @@
   checking and writing, so the two always behave the same way.
 
   Everything for one post or project lives in its own folder, and both the
-  markdown and the images are grouped by category:
+  markdown and the images are grouped by category (names use underscores):
 
-    src/content/<kind>/<Category>/<title-slug>.md
-    public/images/<kind>/<Category>/<Title-Folder>/cover.png
-    public/images/<kind>/<Category>/<Title-Folder>/...every other image
+    src/content/<kind>/<Category folder>/<title_slug>.md
+    public/images/<kind>/<Category folder>/<Title_Folder>/cover.png
+    public/images/<kind>/<Category folder>/<Title_Folder>/...every other image
+
+  For the blog the category folder comes from src/data/blog_categories.mjs,
+  e.g. PLC_LAB/Level_1_Fundamentals, so a new post lands in the right level
+  without moving anything by hand.
   ============================================================================
 */
 
@@ -18,6 +22,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { fileURLToPath } from 'node:url';
 import { CancelledError, createPrompter } from './prompts.mjs';
 import { categoryFolder, folderName, slugify, splitList, todayISODate, yamlList } from './naming.mjs';
+import { BLOG_CATEGORIES } from '../../src/data/blog_categories.mjs';
 import { generateCoverSvg, saveCover } from './generate-cover-svg.mjs';
 
 const ROOT = new URL('../../', import.meta.url);
@@ -39,16 +44,26 @@ function markdownFiles(dir) {
 }
 
 /**
- * The categories already in use, as shown on the site ("PLC LAB", not the
- * folder name "PLC-LAB"). Read from the `category:` line of the first file
- * in each folder; falls back to the folder name.
+ * The categories to offer, as { label, folder, numbered }.
+ *  - blog: the list in src/data/blog_categories.mjs
+ *  - projects: the folders already in use (label read from the `category:`
+ *    line of the first file in each folder; falls back to the folder name)
  */
-function existingCategories(contentDir) {
+function categoryOptions(kind, contentDir) {
+  if (kind.name === 'blog') return BLOG_CATEGORIES;
   return subfolders(contentDir).map((folder) => {
     const [first] = markdownFiles(new URL(`${folder.name}/`, contentDir));
     const match = first && readFileSync(first, 'utf8').match(/^category:\s*"?([^"\r\n]+)"?/m);
-    return match ? match[1].trim() : folder.name.replace(/-/g, ' ');
+    return { label: match ? match[1].trim() : folder.name.replace(/_/g, ' '), folder: folder.name };
   });
+}
+
+/** The next free problem number in a folder (1_..., 2_... -> 3). */
+function nextNumber(folderUrl) {
+  const numbers = markdownFiles(folderUrl)
+    .map((url) => Number(fileURLToPath(url).split(/[\\/]/).pop().match(/^(\d+)_/)?.[1]))
+    .filter(Number.isFinite);
+  return numbers.length ? Math.max(...numbers) + 1 : 1;
 }
 
 const relative = (url) => fileURLToPath(url).replace(fileURLToPath(ROOT), '').replace(/\\/g, '/');
@@ -74,21 +89,34 @@ export async function scaffold(kind) {
     // ---- Questions ---------------------------------------------------------
     prompt.section('Required');
     const title = await prompt.askRequired('Title');
-    const category = await prompt.chooseCategory(existingCategories(contentDir));
+    const options = categoryOptions(kind, contentDir);
+    const category = await prompt.chooseCategory(options.map((option) => option.label));
+    const chosen = options.find((option) => option.label === category);
+    // A category that is not in the list gets a folder made from its name.
+    const catFolder = chosen ? chosen.folder : categoryFolder(category);
+
+    // Practice-problem levels are numbered, so the folder stays in order.
+    let number = '';
+    if (chosen?.numbered) {
+      const suggested = nextNumber(new URL(`${catFolder}/`, contentDir));
+      number = await prompt.ask('Problem number', {
+        fallback: String(suggested),
+        validate: (answer) => (/^\d+$/.test(answer) ? null : 'Please type a whole number.'),
+      });
+    }
     prompt.section('Optional (press Enter to skip)');
     const list = splitList(await prompt.ask(kind.listQuestion, { hint: 'comma-separated' }));
     const summary = await prompt.ask('Summary', { hint: 'one sentence' });
 
     // ---- Work out every name once ---------------------------------------
     const slug = slugify(title);
-    const catFolder = categoryFolder(category);
     const imageFolder = folderName(title);
     if (!slug || !catFolder || !imageFolder) {
       console.error('\nThe title and category must contain letters or numbers. Nothing was created.');
       return;
     }
 
-    const markdownUrl = new URL(`${catFolder}/${slug}.md`, contentDir);
+    const markdownUrl = new URL(`${catFolder}/${number ? `${number}_` : ''}${slug}.md`, contentDir);
     const imageFolderUrl = new URL(`${catFolder}/${imageFolder}/`, imagesDir);
     const imageWebPath = `/images/${kind.name}/${catFolder}/${imageFolder}`;
 
@@ -104,6 +132,7 @@ export async function scaffold(kind) {
     const confirmed = await prompt.confirm([
       ['Title', title],
       ['Category', category],
+      ['Category folder', catFolder],
       ['Markdown file', relative(markdownUrl)],
       ['Image folder', relative(imageFolderUrl)],
     ]);
@@ -142,7 +171,7 @@ export async function scaffold(kind) {
     // ---- Next steps ----------------------------------------------------------
     prompt.nextSteps([
       `Put every image for this ${kind.noun} in ${relative(imageFolderUrl)}`,
-      `Refer to them as ${imageWebPath}/<file-name> (always start with a slash)`,
+      `Refer to them as ${imageWebPath}/<file_name> (always start with a slash, use underscores)`,
       `Write the ${kind.noun} in ${relative(markdownUrl)}`,
       'Change "draft: true" to "draft: false" when it is ready to publish',
       'Run "npm run dev" to preview it',

@@ -6,8 +6,8 @@
   folder with a cover. Works exactly like new-post.mjs.
 
   Creates:
-    src/content/projects/<Category>/<title-slug>.md
-    public/images/projects/<Category>/<Title-Folder>/cover.png
+    src/content/projects/<Category_Folder>/<title_slug>.md
+    public/images/projects/<Category_Folder>/<Title_Folder>/cover.png
 
   The project starts as a draft (hidden from the site) until you change
   `draft: true` to `draft: false`.

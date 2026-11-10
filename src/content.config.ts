@@ -18,6 +18,25 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+// ---- Page addresses (URLs) -------------------------------------------------
+// Files and folders use underscores (1_motor_start.md, Level_1_Fundamentals/),
+// but the address in the browser uses hyphens, which search engines read as
+// word breaks:
+//   PLC_LAB/Level_1_Fundamentals/1_motor_startstop.md
+//   ->  /blog/plc-lab/level-1-fundamentals/motor-startstop
+// A leading problem number ("1_") is dropped from the address.
+// To keep underscores in addresses instead, change this function to
+// `return entry.replace(/\.md$/, '').toLowerCase();`
+function pageId({ entry }: { entry: string }) {
+  const parts = entry.replace(/\.md$/, '').split('/');
+  return parts
+    .map((part, index) => {
+      const clean = part.toLowerCase().replace(/[_\s]+/g, '-');
+      return index === parts.length - 1 ? clean.replace(/^\d+-/, '') : clean;
+    })
+    .join('/');
+}
+
 // ---- Projects -------------------------------------------------------------
 const projects = defineCollection({
   // `glob` tells Astro: "every .md file ANYWHERE under src/content/projects/
@@ -26,7 +45,7 @@ const projects = defineCollection({
   // src/content/projects/Engineering/foo.md and
   // src/content/projects/Automation/bar.md — Astro still treats both as
   // one flat "projects" collection; the folder is just for YOUR tidiness.
-  loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
+  loader: glob({ pattern: '**/*.md', base: './src/content/projects', generateId: pageId }),
   schema: z.object({
     title: z.string(),
     // Groups this project on the /projects page — e.g. "Engineering",
@@ -42,7 +61,7 @@ const projects = defineCollection({
     summary: z.string(),
     // Path to the cover image, relative to /public. Every project keeps ALL its
     // images in its own folder, grouped by category, with the cover called
-    // "cover" — e.g. "/images/projects/Web-Development/My-Project/cover.png".
+    // "cover" — e.g. "/images/projects/Web_Development/My_Project/cover.png".
     // (`npm run new:project` creates the folder and the cover for you.)
     cover: z.string(),
     // Tech-stack chips shown on the card, e.g. ["Arduino", "C++"]
@@ -55,18 +74,18 @@ const projects = defineCollection({
 
 // ---- Blog -------------------------------------------------------------
 const blog = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog', generateId: pageId }),
   schema: z.object({
     title: z.string(),
-    // Groups this post into a topic section on /blog — e.g. "PLC",
-    // "Electronics", "Career". One category per post, so every post has
-    // a clear "home" section. Use `tags` below for extra, more specific
+    // Groups this post into a section on /blog. Use the exact label from
+    // src/data/blog_categories.mjs, e.g. "[ PLC-LAB ] Level 1 - Fundamentals"
+    // (`npm run new:blog` fills it in for you). One category per post. Use `tags` below for extra, more specific
     // labels shown as chips on the card (a post can have several tags,
     // but only ONE category).
     category: z.string(),
     // Short summary shown on the BLOG CARD (listing + homepage)
     summary: z.string(),
-    // Same rule as projects: "/images/blog/<Category>/<Post-Folder>/cover.png".
+    // Same rule as projects: "/images/blog/<Category-Folder>/<Post_Folder>/cover.png".
     // Use JPG or PNG for covers, because LinkedIn skips WebP and SVG previews.
     cover: z.string(),
     tags: z.array(z.string()).default([]),
@@ -80,7 +99,7 @@ const blog = defineCollection({
 // reads this collection and draws a card for each one, newest first, so
 // adding a certificate never means touching any .astro code.
 const certificates = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/certificates' }),
+  loader: glob({ pattern: '**/*.md', base: './src/content/certificates', generateId: pageId }),
   schema: z.object({
     // Name of the certificate, e.g. "PLC Fundamentals (Level I)"
     title: z.string(),
@@ -91,12 +110,12 @@ const certificates = defineCollection({
     // One or two sentences on what the certificate covers
     summary: z.string(),
     // Picture of the certificate, relative to /public,
-    // e.g. "/images/certificates/plc-fundamentals-level-1.jpg"
+    // e.g. "/images/certificates/plc_fundamentals_level_1.jpg"
     image: z.string(),
     // Optional: the provider's public page that proves the certificate is real
     link: z.string().url().optional(),
     // Optional: the PDF copy, relative to /public,
-    // e.g. "/certificates/plc-fundamentals-level-1.pdf"
+    // e.g. "/certificates/plc_fundamentals_level_1.pdf"
     pdf: z.string().optional(),
     // Optional chips shown on the card, e.g. ["Ladder Logic", "HMI"]
     skills: z.array(z.string()).default([]),

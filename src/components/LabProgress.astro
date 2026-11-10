@@ -1,0 +1,156 @@
+---
+/*
+  LabProgress.astro
+  ------------------------------------------------------------------------
+  Homepage section: how far I am through the three PLC-LAB levels. The
+  counts are read from the published posts, so writing a new post moves
+  the bar by itself. The number of problems in each level (`total`) and the
+  order come from src/data/blog_categories.mjs.
+------------------------------------------------------------------------- */
+import { getCollection } from 'astro:content';
+import { BLOG_CATEGORIES } from '../data/blog_categories.mjs';
+import { categoryAnchor, splitCategory } from '../lib/blog';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+
+const levels = BLOG_CATEGORIES.filter((c) => c.numbered).map((c) => {
+  const done = posts.filter((p) => p.data.category === c.label).length;
+  const total = c.total ?? done;
+  const status = done === 0 ? 'soon' : done >= total ? 'complete' : 'progress';
+  return {
+    ...splitCategory(c.label),
+    anchor: categoryAnchor(c.label),
+    blurb: c.blurb,
+    done,
+    total,
+    percent: total ? Math.round((done / total) * 100) : 0,
+    status,
+  };
+});
+
+const statusText = { complete: 'Complete', progress: 'In progress', soon: 'Coming up' };
+---
+
+<section id="lab" class="section alt-section">
+  <div class="container">
+    <div class="section-heading-row">
+      <div>
+        <p class="eyebrow"><span class="led-dot"></span>PLC-LAB</p>
+        <h2>Learning path</h2>
+      </div>
+      <a class="btn btn-ghost" href="/blog">See all write-ups</a>
+    </div>
+    <p class="intro">
+      A practice problem, a ladder program, a test and a write-up, again and
+      again, one level at a time.
+    </p>
+
+    <div class="level-grid">
+      {levels.map((level) => (
+        <a class:list={['level-card', 'card', level.status]} href={`/blog#${level.anchor}`}>
+          <div class="level-top">
+            <h3>{level.title}</h3>
+            <span class="status">{statusText[level.status]}</span>
+          </div>
+          <p class="level-blurb">{level.blurb}</p>
+          <div class="meter" role="img" aria-label={`${level.done} of ${level.total} write-ups published`}>
+            <span style={`width: ${level.percent}%`}></span>
+          </div>
+          <p class="level-count"><b>{level.done}</b> / {level.total} write-ups</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .alt-section {
+    border-top: 1px solid var(--divider-color);
+    border-bottom: 1px solid var(--divider-color);
+  }
+  .section-heading-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+  .section-heading-row h2 {
+    margin-bottom: 0;
+  }
+  .intro {
+    max-width: 58ch;
+    margin-bottom: var(--space-md);
+    text-align: left;
+  }
+
+  .level-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .level-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+  }
+  .level-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-xs);
+  }
+  .level-top h3 {
+    font-size: 1.05rem;
+    margin-bottom: var(--space-xs);
+  }
+  .status {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    white-space: nowrap;
+  }
+  .progress .status,
+  .complete .status {
+    color: var(--teal);
+    border-color: var(--teal-border);
+  }
+
+  .level-blurb {
+    font-size: 0.9rem;
+    flex: 1;
+    text-align: left;
+  }
+
+  .meter {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--divider-color);
+    overflow: hidden;
+  }
+  .meter span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--teal);
+    box-shadow: 0 0 8px var(--teal-glow);
+  }
+  .level-count {
+    margin: var(--space-xs) 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-align: left;
+  }
+  .level-count b {
+    color: var(--heading-color);
+  }
+  .soon {
+    opacity: 0.75;
+  }
+</style>

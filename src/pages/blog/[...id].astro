@@ -11,24 +11,32 @@
 ------------------------------------------------------------------------- */
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import { formatDate, readingMinutes } from '../../lib/blog';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map((entry) => ({
-    params: { id: entry.id },
-    props: { entry },
-  }));
+  return posts.map((entry) => {
+    // Neighbours in the same category, oldest to newest, for the
+    // "Previous / Next" links at the bottom of the post.
+    const series = posts
+      .filter((post) => post.data.category === entry.data.category)
+      .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+    const index = series.findIndex((post) => post.id === entry.id);
+    return {
+      params: { id: entry.id },
+      props: { entry, previous: series[index - 1], next: series[index + 1] },
+    };
+  });
 }
 
-const { entry } = Astro.props;
-const { title, cover, tags, date } = entry.data;
-const { Content } = await render(entry);
+const { entry, previous, next } = Astro.props;
+const { title, cover, tags, date, category } = entry.data;
+const { Content, headings } = await render(entry);
 
-const formattedDate = date.toLocaleDateString('en-GB', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-});
+const formattedDate = formatDate(date);
+const minutes = readingMinutes(entry.body);
+// "On this page" list: only the main sections, and only for longer posts
+const contents = headings.filter((heading) => heading.depth === 2);
 ---
 
 <Layout title={`${title}`} description={entry.data.summary} image={cover} type="article">
@@ -36,8 +44,9 @@ const formattedDate = date.toLocaleDateString('en-GB', {
     <div class="container narrow">
       <a class="back-link" href="/blog">&larr; All posts</a>
 
-      <p class="eyebrow"><span class="led-dot"></span>{formattedDate}</p>
+      <p class="eyebrow"><span class="led-dot"></span>{formattedDate} · {minutes} min read</p>
       <h1>{title}</h1>
+      <p class="post-category">{category}</p>
 
       {tags.length > 0 && (
         <div class="tag-row">
@@ -49,9 +58,37 @@ const formattedDate = date.toLocaleDateString('en-GB', {
         <img src={cover} alt="" />
       </div>
 
+      {contents.length >= 3 && (
+        <details class="toc">
+          <summary>On this page</summary>
+          <ol>
+            {contents.map((heading) => (
+              <li><a href={`#${heading.slug}`}>{heading.text}</a></li>
+            ))}
+          </ol>
+        </details>
+      )}
+
       <div class="prose">
         <Content />
       </div>
+
+      {(previous || next) && (
+        <nav class="post-nav" aria-label="More posts in this category">
+          {previous ? (
+            <a class="post-nav-link" href={`/blog/${previous.id}`}>
+              <span class="post-nav-label">&larr; Previous</span>
+              <span class="post-nav-title">{previous.data.title}</span>
+            </a>
+          ) : <span></span>}
+          {next ? (
+            <a class="post-nav-link post-nav-next" href={`/blog/${next.id}`}>
+              <span class="post-nav-label">Next &rarr;</span>
+              <span class="post-nav-title">{next.data.title}</span>
+            </a>
+          ) : <span></span>}
+        </nav>
+      )}
     </div>
   </article>
 </Layout>
@@ -78,6 +115,14 @@ const formattedDate = date.toLocaleDateString('en-GB', {
     margin-top: var(--space-xs);
   }
 
+  .post-category {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-color);
+    margin: var(--space-xs) 0 0;
+    text-align: left;
+  }
+
   .tag-row {
     display: flex;
     flex-wrap: wrap;
@@ -96,6 +141,10 @@ const formattedDate = date.toLocaleDateString('en-GB', {
     display: block;
   }
 
+  .prose :global(h2),
+  .prose :global(h3) {
+    scroll-margin-top: 5rem;
+  }
   .prose :global(h2) {
     font-size: 1.4rem;
     margin-top: var(--space-lg);
@@ -137,5 +186,77 @@ const formattedDate = date.toLocaleDateString('en-GB', {
     color: var(--text-color);
     font-style: italic;
     margin: var(--space-md) 0;
+  }
+
+  /* "On this page" list */
+  .toc {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    padding: 0.8rem 1.1rem;
+    margin-bottom: var(--space-md);
+  }
+  .toc summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+  .toc ol {
+    margin: var(--space-xs) 0 0;
+    padding-left: 1.3rem;
+    font-size: 0.92rem;
+  }
+  .toc li {
+    margin-bottom: 0.25rem;
+  }
+  .toc a:hover {
+    color: var(--teal);
+  }
+
+  /* Previous / next post */
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin-top: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--divider-color);
+  }
+  .post-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    transition: border-color 0.15s ease;
+  }
+  .post-nav-link:hover {
+    border-color: var(--teal);
+  }
+  .post-nav-next {
+    text-align: right;
+    grid-column: 2;
+  }
+  .post-nav-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--teal);
+  }
+  .post-nav-title {
+    color: var(--heading-color);
+    font-weight: 500;
+  }
+  @media (max-width: 600px) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+    .post-nav-next {
+      grid-column: 1;
+    }
   }
 </style>

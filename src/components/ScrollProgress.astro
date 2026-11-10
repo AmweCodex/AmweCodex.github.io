@@ -1,0 +1,70 @@
+---
+/*
+  ScrollProgress.astro
+  ------------------------------------------------------------------------
+  A thin teal bar fixed to the very top of the screen that fills from left
+  to right as you scroll down the page, so a reader always knows how much
+  is left. It sits above the sticky header, on every page.
+
+  How it works: the bar is full width but squashed with transform: scaleX(),
+  and a tiny script sets that scale from the scroll position. Moving a
+  transform is smooth and cheap for the browser (no layout work).
+------------------------------------------------------------------------- */
+---
+
+<div class="scroll-progress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <div class="scroll-progress-bar"></div>
+</div>
+
+<style>
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    z-index: 100; /* above the sticky header (z-index 50) */
+    pointer-events: none;
+  }
+  .scroll-progress-bar {
+    height: 100%;
+    background: var(--teal);
+    box-shadow: 0 0 10px var(--teal-glow);
+    border-radius: 0 3px 3px 0;
+    transform: scaleX(0);
+    transform-origin: left center;
+    will-change: transform;
+  }
+</style>
+
+<script>
+  const wrapper = document.querySelector<HTMLElement>('.scroll-progress');
+  const bar = document.querySelector<HTMLElement>('.scroll-progress-bar');
+
+  if (wrapper && bar) {
+    let queued = false;
+
+    const update = () => {
+      queued = false;
+      const root = document.documentElement;
+      const scrollable = root.scrollHeight - root.clientHeight;
+      const ratio = scrollable > 0 ? Math.min(1, Math.max(0, root.scrollTop / scrollable)) : 0;
+      bar.style.transform = `scaleX(${ratio})`;
+      wrapper.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
+    };
+
+    // One update per animation frame, however fast the scroll events arrive
+    const request = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    addEventListener('scroll', request, { passive: true });
+    addEventListener('resize', request);
+    // Images and fonts change the page height after load
+    addEventListener('load', request);
+    update();
+  }
+</script>

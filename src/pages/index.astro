@@ -3,12 +3,12 @@
   index.astro
   ------------------------------------------------------------------------
   The homepage. Assembles sections in order, wrapped in the shared Layout.
-  Skills moved out to /about (see about.astro) — this page now shows a
-  preview of the 3 latest projects and 3 latest blog posts instead, each
-  linking through to their full listing page.
+  Order: hero, PLC-LAB learning path, latest blog posts, latest projects,
+  experience, education & certifications. Skills live on /about.
 ------------------------------------------------------------------------- */
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
+import LabProgress from '../components/LabProgress.astro';
 import ProjectsPreview from '../components/ProjectsPreview.astro';
 import BlogPreview from '../components/BlogPreview.astro';
 import Experience from '../components/Experience.astro';
@@ -18,10 +18,11 @@ import LadderRung from '../components/LadderRung.astro';
 
 <Layout title="Musawandile Shamase">
   <Hero />
+  <LadderRung label="PLC-LAB" />
+  <LabProgress />
+  <BlogPreview />
   <LadderRung label="PROJECTS" />
   <ProjectsPreview />
-  <LadderRung label="BLOG" />
-  <BlogPreview />
   <LadderRung label="EXPERIENCE" />
   <Experience />
   <Certifications />

@@ -2,29 +2,27 @@
 /*
   src/pages/blog/index.astro  →  the page at /blog
   ------------------------------------------------------------------------
-  Same grouping approach as src/pages/projects/index.astro — see the
-  comments there for the full explanation. Here it groups blog posts by
-  `category` instead of always being one long PLC-only list, so as your
-  learning journey covers other topics (Electronics, Career, etc.) each
-  gets its own clearly-labelled section. `tags` (already on each post)
-  still show as the small chips on each card for finer-grained labels.
+  One section per category, in the order set in src/data/blog_categories.mjs:
+
+    [ PLC-LAB ] Level 1 - Fundamentals
+    [ PLC-LAB ] Level 2 - Intermediate
+    [ PLC-LAB ] Level 3 - Industrial And Capstone
+    PLC-BASICS
+
+  Any category that is not in that file appears after them, the most
+  recently updated one first (see src/lib/blog.ts). A listed category with
+  no published posts yet shows a "coming soon" note, so the structure of
+  the whole learning path is visible from day one.
 ------------------------------------------------------------------------- */
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import BlogCard from '../../components/BlogCard.astro';
+import { categoryAnchor, groupPosts, splitCategory } from '../../lib/blog';
 
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-
-// Every unique category currently in use, e.g. ["PLC", "Electronics"].
-const categories = [...new Set(allPosts.map((entry) => entry.data.category))];
-
-// Group posts by category, newest-first within each group.
-const postsByCategory = categories.map((category) => ({
-  category,
-  entries: allPosts
-    .filter((entry) => entry.data.category === category)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
-}));
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const groups = groupPosts(posts)
+  // an unlisted category with no posts cannot exist, but a listed one can
+  .map((group) => ({ ...group, ...splitCategory(group.category), anchor: categoryAnchor(group.category) }));
 ---
 
 <Layout title="Blog — Musawandile Shamase" description="Notes from Musawandile Shamase's engineering and PLC learning journey.">
@@ -33,16 +31,35 @@ const postsByCategory = categories.map((category) => ({
       <p class="eyebrow"><span class="led-dot"></span>Blog</p>
       <h1>Learning journey</h1>
       <p class="page-intro">
-        Notes and write-ups as I learn — PLC programming, electronics,
-        and whatever else comes up along the way, grouped by topic below.
+        Notes and write-ups as I learn: PLC practice problems, the theory
+        behind them, and whatever else comes up along the way.
       </p>
 
-      {postsByCategory.map(({ category, entries }) => (
-        <div class="category-group">
-          <h2>{category}</h2>
-          <div class="blog-grid">
-            {entries.map((entry) => <BlogCard entry={entry} />)}
-          </div>
+      <!-- Jump links to each section -->
+      <nav class="jump-links" aria-label="Blog sections">
+        {groups.map((group) => (
+          <a href={`#${group.anchor}`} class="jump-chip">
+            <span class="jump-count">{group.entries.length}</span>
+            {group.tag ? `${group.tag} · ${group.title}` : group.title}
+          </a>
+        ))}
+      </nav>
+
+      {groups.map((group) => (
+        <div class="category-group" id={group.anchor}>
+          <h2 class="category-title">
+            {group.tag && <span class="category-tag">[ {group.tag} ]</span>}
+            {group.title}
+          </h2>
+          {group.blurb && <p class="category-blurb">{group.blurb}</p>}
+
+          {group.entries.length > 0 ? (
+            <div class="blog-grid">
+              {group.entries.map((entry) => <BlogCard entry={entry} />)}
+            </div>
+          ) : (
+            <p class="coming-soon"><span class="led-dot"></span>Coming soon. Posts will appear here as I write them.</p>
+          )}
         </div>
       ))}
     </div>
@@ -52,17 +69,85 @@ const postsByCategory = categories.map((category) => ({
 <style>
   .page-intro {
     max-width: 60ch;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
   }
 
-  /* Space between each topic's section */
+  .jump-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: var(--space-lg);
+  }
+  .jump-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.35rem 0.8rem 0.35rem 0.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    background: var(--bg-secondary);
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .jump-chip:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+  .jump-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 999px;
+    background: var(--hover-tint);
+    color: var(--teal);
+    font-size: 0.7rem;
+  }
+
+  /* Space between each category's section; the offset keeps the heading
+     clear of the sticky header when a jump link scrolls to it. */
+  .category-group {
+    scroll-margin-top: 5rem;
+  }
   .category-group + .category-group {
-    margin-top: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+
+  .category-title {
+    font-size: clamp(1.25rem, 3vw, 1.6rem);
+    margin-bottom: 0.3rem;
+  }
+  .category-tag {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--teal);
+    margin-right: 0.6rem;
+    white-space: nowrap;
+  }
+  .category-blurb {
+    font-size: 0.92rem;
+    margin-bottom: var(--space-md);
+    text-align: left;
   }
 
   .blog-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--space-md);
+  }
+
+  .coming-soon {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border: 1px dashed var(--border-color);
+    border-radius: 14px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    margin: 0;
+    text-align: left;
   }
 </style>
